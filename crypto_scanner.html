@@ -234,7 +234,7 @@ function load() {
           document.getElementById('m5').textContent = new Date().toLocaleTimeString('ko-KR');
           setProgress(100);
           setTimeout(function() { setProgress(0); }, 800);
-          var tfLabel = {1w:'주봉',1M:'월봉','3d':'3일봉','1d':'일봉'}[tf] || tf;
+          var tfLabel = {'1w':'주봉','1M':'월봉','3d':'3일봉','1d':'일봉'}[tf] || tf;
           st.className = 'status';
           st.textContent = rows.length + '개 분석 완료 · ' + tfLabel + ' 기준 · HH·HL: ' + rows.filter(function(d){return d.hl===2;}).length + '개';
           render();
