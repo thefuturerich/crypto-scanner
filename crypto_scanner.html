@@ -75,8 +75,8 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .div-bull { background: rgba(0,245,160,0.15); color: #00f5a0; border: 1px solid rgba(0,245,160,0.4); }
 .div-bear { background: rgba(255,77,106,0.15); color: #ff4d6a; border: 1px solid rgba(255,77,106,0.4); }
 .chart-outer { position: relative; margin-bottom: 8px; background: #111118; border: 1px solid #222230; border-radius: 10px; overflow: hidden; }
-.draw-overlay { position: absolute; top: 0; left: 0; z-index: 10; pointer-events: none; }
-.draw-overlay.active { pointer-events: all; cursor: crosshair; }
+.draw-overlay { position: absolute; top: 0; left: 0; z-index: 10; pointer-events: none; cursor: default; }
+.draw-overlay.active { pointer-events: all !important; cursor: crosshair !important; }
 #vol-chart-container, #rsi-chart-container { background: #111118; border: 1px solid #222230; border-radius: 10px; margin-bottom: 8px; overflow: hidden; position: relative; }
 .rsi-label { position: absolute; top: 7px; left: 10px; font-size: 10px; color: #6b6b80; z-index: 5; pointer-events: none; }
 .loading-chart { text-align: center; padding: 60px; color: #6b6b80; font-size: 13px; }
@@ -497,13 +497,27 @@ function openChart(sym) {
 
   Promise.all([
     fetch('https://fapi.binance.com/fapi/v1/openInterest?symbol=' + sym + 'USDT').then(function(r) { return r.json(); }).catch(function() { return null; }),
-    fetch('https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=' + sym + 'USDT&period=5m&limit=1').then(function(r) { return r.json(); }).catch(function() { return null; })
+    fetch('https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=' + sym + 'USDT&period=5m&limit=1').then(function(r) { return r.json(); }).catch(function() { return null; }),
+    fetch('https://api.bybit.com/v5/market/open-interest?category=linear&symbol=' + sym + 'USDT&intervalTime=5min&limit=1').then(function(r) { return r.json(); }).catch(function() { return null; })
   ]).then(function(res) {
-    var oi = res[0], ls = res[1];
+    var oi = res[0], ls = res[1], bybitOi = res[2];
+    var oiSet = false;
     if (oi && oi.openInterest) {
       var price = row ? row.price : 0;
-      document.getElementById('m-oi').textContent = fmtBig(parseFloat(oi.openInterest) * price);
+      var oiUsd = parseFloat(oi.openInterest) * price;
+      if (oiUsd > 0) {
+        document.getElementById('m-oi').textContent = fmtBig(oiUsd);
+        oiSet = true;
+      }
     }
+    if (!oiSet && bybitOi && bybitOi.result && bybitOi.result.list && bybitOi.result.list[0]) {
+      var bOi = parseFloat(bybitOi.result.list[0].openInterestValue);
+      if (bOi > 0) {
+        document.getElementById('m-oi').textContent = fmtBig(bOi) + ' (Bybit)';
+        oiSet = true;
+      }
+    }
+    if (!oiSet) document.getElementById('m-oi').textContent = 'N/A';
     if (ls && Array.isArray(ls) && ls[0]) {
       var lPct = parseFloat(ls[0].longAccount) * 100;
       var sPct = parseFloat(ls[0].shortAccount) * 100;
@@ -666,12 +680,26 @@ function redrawOverlay() {
 }
 
 document.getElementById('draw-overlay').addEventListener('click', function(e) {
-  if (!mainChart) return;
+  if (!mainChart || activeTool === 'cursor') return;
   var ov = document.getElementById('draw-overlay');
   var rect = ov.getBoundingClientRect();
   var x = e.clientX - rect.left;
   var y = e.clientY - rect.top;
+  handleDraw(x, y);
+});
 
+document.querySelector('.chart-outer').addEventListener('click', function(e) {
+  if (!mainChart || activeTool === 'cursor') return;
+  var ov = document.getElementById('draw-overlay');
+  if (e.target === ov) return; // already handled
+  var rect = ov.getBoundingClientRect();
+  var x = e.clientX - rect.left;
+  var y = e.clientY - rect.top;
+  handleDraw(x, y);
+});
+
+function handleDraw(x, y) {
+  var ov = document.getElementById('draw-overlay');
   if (activeTool === 'hline') {
     var price = mainChart.priceScale('right').coordinateToPrice(y);
     if (price !== null) {
@@ -708,7 +736,7 @@ document.getElementById('draw-overlay').addEventListener('click', function(e) {
       }
     }
   }
-});
+}
 
 function loadNews(sym) {
   document.getElementById('news-title').textContent = sym + ' News - Loading...';
