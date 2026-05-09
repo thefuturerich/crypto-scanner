@@ -56,7 +56,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .chart-sym { font-size: 22px; font-weight: bold; color: #00f5a0; }
 .chart-price { font-size: 17px; color: #e8e8f0; }
 .chart-chg { font-size: 14px; }
-.tf-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.tf-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
 .tf-btn { font-family: monospace; font-size: 13px; padding: 7px 16px; border-radius: 6px; border: 1px solid #2a2a3a; background: transparent; color: #6b6b80; cursor: pointer; font-weight: bold; }
 .tf-btn:hover { color: #e8e8f0; border-color: #e8e8f0; }
 .tf-btn.on { background: rgba(0,245,160,0.12); color: #00f5a0; border-color: #00f5a0; }
@@ -69,19 +69,18 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .tool-btn:hover { color: #e8e8f0; border-color: #e8e8f0; }
 .tool-btn.on { background: rgba(0,200,255,0.1); color: #00c8ff; border-color: #00c8ff; }
 .tool-btn.red { color: #ff4d6a; border-color: rgba(255,77,106,0.4); background: rgba(255,77,106,0.08); }
-.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; margin-bottom: 8px; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; margin-bottom: 8px; align-items: center; }
 .leg-item { display: flex; align-items: center; gap: 5px; }
 .leg-line { width: 18px; height: 2px; border-radius: 1px; }
-.div-badge { display: none; font-size: 11px; padding: 3px 10px; border-radius: 99px; font-weight: bold; margin-left: auto; }
+.tool-hint { font-size: 11px; color: #00c8ff; margin-left: auto; }
+.div-badge { display: none; font-size: 11px; padding: 3px 10px; border-radius: 99px; font-weight: bold; }
 .div-bull { background: rgba(0,245,160,0.15); color: #00f5a0; border: 1px solid rgba(0,245,160,0.4); }
 .div-bear { background: rgba(255,77,106,0.15); color: #ff4d6a; border: 1px solid rgba(255,77,106,0.4); }
-#main-chart-container { background: #111118; border: 1px solid #222230; border-radius: 10px; margin-bottom: 8px; overflow: hidden; }
-#vol-chart-container { background: #111118; border: 1px solid #222230; border-radius: 10px; margin-bottom: 8px; overflow: hidden; }
-#rsi-chart-container { background: #111118; border: 1px solid #222230; border-radius: 10px; margin-bottom: 8px; overflow: hidden; position: relative; }
+.chart-outer { position: relative; margin-bottom: 8px; background: #111118; border: 1px solid #222230; border-radius: 10px; overflow: hidden; }
+.draw-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; cursor: default; }
+#vol-chart-container, #rsi-chart-container { background: #111118; border: 1px solid #222230; border-radius: 10px; margin-bottom: 8px; overflow: hidden; position: relative; }
 .rsi-label { position: absolute; top: 7px; left: 10px; font-size: 10px; color: #6b6b80; z-index: 5; pointer-events: none; }
 .loading-chart { text-align: center; padding: 60px; color: #6b6b80; font-size: 13px; }
-
-/* NEWS */
 .news-section { background: #111118; border: 1px solid #222230; border-radius: 10px; padding: 14px; margin-bottom: 8px; }
 .news-title { font-size: 11px; color: #6b6b80; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
 .news-item { padding: 8px 0; border-bottom: 1px solid #1a1a24; }
@@ -167,44 +166,42 @@ tr:hover td { background: rgba(255,255,255,0.02); }
     <span class="chart-price" id="c-price">-</span>
     <span class="chart-chg" id="c-chg">-</span>
   </div>
-
-  <div class="tf-btns" style="margin-bottom:10px">
+  <div class="tf-btns">
     <button class="tf-btn" data-tf="1h">1H</button>
     <button class="tf-btn" data-tf="4h">4H</button>
     <button class="tf-btn" data-tf="1d">1D</button>
     <button class="tf-btn on" data-tf="1w">1W</button>
   </div>
-
-  <div class="chart-meta" id="chart-meta">
+  <div class="chart-meta">
     <div class="meta-item"><div class="meta-label">시가총액</div><div class="meta-val" id="m-cap">-</div></div>
     <div class="meta-item"><div class="meta-label">24h 거래량</div><div class="meta-val" id="m-vol">-</div></div>
     <div class="meta-item"><div class="meta-label">펀딩비</div><div class="meta-val" id="m-funding">-</div></div>
     <div class="meta-item"><div class="meta-label">미결제(OI)</div><div class="meta-val" id="m-oi">-</div></div>
     <div class="meta-item"><div class="meta-label">롱/숏 비율</div><div class="meta-val" id="m-ls">-</div></div>
   </div>
-
   <div class="tool-row">
     <button class="tool-btn on" id="tool-cursor">✥ 커서</button>
     <button class="tool-btn" id="tool-hline">— 수평선</button>
-    <button class="tool-btn" id="tool-tline">╱ 추세선 (점2개)</button>
+    <button class="tool-btn" id="tool-tline">╱ 추세선</button>
     <button class="tool-btn red" id="tool-clear">✕ 전체삭제</button>
     <span id="div-badge" class="div-badge"></span>
   </div>
-
   <div class="legend">
     <div class="leg-item"><div class="leg-line" style="background:#ff4444"></div><span style="color:#ff4444">MA7</span></div>
     <div class="leg-item"><div class="leg-line" style="background:#ff8800"></div><span style="color:#ff8800">MA50</span></div>
     <div class="leg-item"><div class="leg-line" style="background:#ffd700"></div><span style="color:#ffd700">MA200</span></div>
-    <div class="leg-item"><div class="leg-line" style="background:#888"></div><span style="color:#888">BB(20,2)</span></div>
-    <div class="leg-item" style="margin-left:auto; font-size:11px; color:#6b6b80" id="tool-hint">커서 모드</div>
+    <div class="leg-item"><div class="leg-line" style="background:#888"></div><span style="color:#888">BB</span></div>
+    <span class="tool-hint" id="tool-hint">커서 모드</span>
   </div>
 
-  <div id="main-chart-container"><div class="loading-chart" id="chart-loading">차트 불러오는 중...</div></div>
+  <div class="chart-outer">
+    <div id="main-chart-container"><div class="loading-chart" id="chart-loading">차트 불러오는 중...</div></div>
+    <canvas id="draw-overlay" class="draw-overlay" style="display:none"></canvas>
+  </div>
   <div id="vol-chart-container" style="display:none"></div>
   <div id="rsi-chart-container" style="display:none"><div class="rsi-label">RSI 14</div></div>
-
-  <div class="news-section" id="news-section">
-    <div class="news-title" id="news-title">뉴스 불러오는 중...</div>
+  <div class="news-section">
+    <div class="news-title" id="news-title">뉴스</div>
     <div id="news-list"></div>
   </div>
 </div>
@@ -212,524 +209,547 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <script>
 var rows = [];
-var fMode = 'hl';
-var sKey = 'hl';
-var sDir = -1;
-var currentSym = '';
-var currentTf = '1w';
-var mainChart = null;
-var volChart = null;
-var rsiChart = null;
+var fMode = 'hl', sKey = 'hl', sDir = -1;
+var currentSym = '', currentTf = '1w';
+var mainChart = null, volChart = null, rsiChart = null;
 var candleSeries = null;
 var activeTool = 'cursor';
 var trendPoints = [];
-var drawnSeries = [];
-var drawnPriceLines = [];
+var drawnSeries = [], drawnPriceLines = [];
+var overlayLines = []; // for canvas overlay
+var capMap = {}; // symbol -> marketcap from coingecko
 
 /* ---- UTILS ---- */
 function fmtPrice(n) {
   if (n === null || n === undefined || isNaN(n)) return '-';
   if (n < 0.000001) return n.toFixed(8);
-  if (n < 0.0001) return n.toFixed(7);
-  if (n < 0.001) return n.toFixed(6);
-  if (n < 0.01) return n.toFixed(5);
-  if (n < 0.1) return n.toFixed(4);
+  if (n < 0.00001) return n.toFixed(7);
+  if (n < 0.0001) return n.toFixed(6);
+  if (n < 0.001) return n.toFixed(5);
+  if (n < 0.01) return n.toFixed(4);
   if (n < 1) return n.toFixed(4);
   if (n < 10) return n.toFixed(3);
-  if (n < 100) return n.toFixed(2);
   if (n < 1000) return n.toFixed(2);
-  return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  return n.toLocaleString('en-US', {maximumFractionDigits:2});
 }
-
-function fmtVol(n) {
-  if (!n) return '-';
-  if (n >= 1e9) return '$' + (n/1e9).toFixed(2) + 'B';
-  if (n >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
-  return '$' + (n/1e3).toFixed(0) + 'K';
+function fmtBig(n) {
+  if (!n || isNaN(n)) return '-';
+  if (n >= 1e12) return '$'+(n/1e12).toFixed(2)+'T';
+  if (n >= 1e9) return '$'+(n/1e9).toFixed(2)+'B';
+  if (n >= 1e6) return '$'+(n/1e6).toFixed(1)+'M';
+  return '$'+(n/1e3).toFixed(0)+'K';
 }
+function setProgress(p) { document.getElementById('prog').style.width = p+'%'; }
 
-function fmtCap(n) {
-  if (!n) return '-';
-  if (n >= 1e9) return '$' + (n/1e9).toFixed(2) + 'B';
-  if (n >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
-  return '$' + (n/1e3).toFixed(0) + 'K';
+/* ---- LOAD MARKET CAPS from CoinGecko ---- */
+function loadMarketCaps(syms) {
+  var ids = syms.slice(0,100).map(function(s){ return s.toLowerCase(); }).join(',');
+  return fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&symbols='+ids+'&per_page=250&page=1')
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (!Array.isArray(data)) return;
+      data.forEach(function(c) {
+        var sym = c.symbol.toUpperCase();
+        capMap[sym] = c.market_cap;
+      });
+    }).catch(function(){});
 }
-
-function setProgress(pct) { document.getElementById('prog').style.width = pct + '%'; }
 
 /* ---- SCANNER ---- */
 function setFilter(m) {
   fMode = m;
-  document.getElementById('btn-hl').className = m === 'hl' ? 'btn on' : 'btn';
-  document.getElementById('btn-trend').className = m === 'trend' ? 'btn on' : 'btn';
-  document.getElementById('btn-all').className = m === 'all' ? 'btn on' : 'btn';
+  document.getElementById('btn-hl').className = m==='hl'?'btn on':'btn';
+  document.getElementById('btn-trend').className = m==='trend'?'btn on':'btn';
+  document.getElementById('btn-all').className = m==='all'?'btn on':'btn';
   render();
 }
-
 function sortBy(k) {
-  if (sKey === k) sDir *= -1; else { sKey = k; sDir = -1; }
+  if (sKey===k) sDir*=-1; else { sKey=k; sDir=-1; }
   render();
 }
 
 function load() {
   var tf = document.getElementById('tf').value;
-  var minVolM = parseFloat(document.getElementById('minvol').value) * 1e6;
+  var minVolM = parseFloat(document.getElementById('minvol').value)*1e6;
   var st = document.getElementById('st');
-  st.className = 'status loading';
-  st.textContent = '바이낸스 API 연결 중...';
-  document.getElementById('tb').innerHTML = '<tr><td colspan="10" class="empty">로딩 중...</td></tr>';
+  st.className='status loading'; st.textContent='바이낸스 API 연결 중...';
+  document.getElementById('tb').innerHTML='<tr><td colspan="10" class="empty">로딩 중...</td></tr>';
   setProgress(5);
 
   Promise.all([
     fetch('https://api.binance.com/api/v3/ticker/24hr').then(function(r){return r.json();}),
-    fetch('https://fapi.binance.com/fapi/v1/premiumIndex').then(function(r){return r.json();}).catch(function(){return [];}),
-    fetch('https://fapi.binance.com/fapi/v1/openInterest?symbol=BTCUSDT').then(function(r){return r.json();}).catch(function(){return {};})
-  ]).then(function(results) {
-    var tickers = results[0];
-    var fundingRaw = results[1];
-
+    fetch('https://fapi.binance.com/fapi/v1/premiumIndex').then(function(r){return r.json();}).catch(function(){return [];})
+  ]).then(function(res) {
+    var tickers = res[0];
+    var fundingRaw = res[1];
     var fundingMap = {};
     if (Array.isArray(fundingRaw)) {
-      fundingRaw.forEach(function(f) { fundingMap[f.symbol] = parseFloat(f.lastFundingRate) * 100; });
+      fundingRaw.forEach(function(f){ fundingMap[f.symbol] = parseFloat(f.lastFundingRate)*100; });
     }
-
     setProgress(20);
+
     var skip = ['DOWN','UP','BEAR','BULL','TUSD','USDC','BUSD','DAI','FDUSD','USDP'];
     var pool = tickers.filter(function(t) {
       if (!t.symbol.endsWith('USDT')) return false;
-      for (var i = 0; i < skip.length; i++) { if (t.symbol.indexOf(skip[i]) >= 0) return false; }
-      return parseFloat(t.quoteVolume) >= minVolM;
+      for (var i=0;i<skip.length;i++) { if (t.symbol.indexOf(skip[i])>=0) return false; }
+      return parseFloat(t.quoteVolume)>=minVolM;
     });
-    pool.sort(function(a,b){ return parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume); });
-    pool = pool.slice(0, 80);
+    pool.sort(function(a,b){ return parseFloat(b.quoteVolume)-parseFloat(a.quoteVolume); });
+    pool = pool.slice(0,80);
 
-    st.textContent = pool.length + '개 종목 분석 중...';
-    var analyzed = [];
-    var idx = 0;
+    // Load market caps
+    var syms = pool.map(function(t){ return t.symbol.replace('USDT',''); });
+    loadMarketCaps(syms).then(function() {
+      st.textContent = pool.length+'개 종목 분석 중...';
+      var analyzed = [], idx = 0;
 
-    function nextBatch() {
-      if (idx >= pool.length) {
-        rows = analyzed;
-        document.getElementById('m1').textContent = rows.length;
-        document.getElementById('m2').textContent = rows.filter(function(d){return d.hl===2;}).length;
-        document.getElementById('m3').textContent = rows.filter(function(d){return d.strong;}).length;
-        document.getElementById('m4').textContent = rows.filter(function(d){return d.vSpike;}).length;
-        document.getElementById('m5').textContent = new Date().toLocaleTimeString('ko-KR');
-        setProgress(100);
-        setTimeout(function(){ setProgress(0); }, 800);
-        var lbls = {'1w':'주봉','1M':'월봉','3d':'3일봉','1d':'일봉'};
-        st.className = 'status';
-        st.textContent = rows.length + '개 완료 · ' + (lbls[tf]||tf) + ' · HH·HL: ' + rows.filter(function(d){return d.hl===2;}).length + '개';
-        render();
-        return;
+      function nextBatch() {
+        if (idx >= pool.length) {
+          rows = analyzed;
+          document.getElementById('m1').textContent = rows.length;
+          document.getElementById('m2').textContent = rows.filter(function(d){return d.hl===2;}).length;
+          document.getElementById('m3').textContent = rows.filter(function(d){return d.strong;}).length;
+          document.getElementById('m4').textContent = rows.filter(function(d){return d.vSpike;}).length;
+          document.getElementById('m5').textContent = new Date().toLocaleTimeString('ko-KR');
+          setProgress(100);
+          setTimeout(function(){setProgress(0);},800);
+          var lbls={'1w':'주봉','1M':'월봉','3d':'3일봉','1d':'일봉'};
+          st.className='status';
+          st.textContent=rows.length+'개 완료 · '+(lbls[tf]||tf)+' · HH·HL: '+rows.filter(function(d){return d.hl===2;}).length+'개';
+          render();
+          return;
+        }
+        var batch = pool.slice(idx,idx+8);
+        idx+=8;
+        setProgress(20+Math.round((idx/pool.length)*75));
+        st.textContent=Math.min(idx,pool.length)+'/'+pool.length+' 분석 중...';
+        var promises = batch.map(function(t) {
+          return fetch('https://api.binance.com/api/v3/klines?symbol='+t.symbol+'&interval='+tf+'&limit=12')
+            .then(function(r){return r.json();})
+            .then(function(kl) {
+              if (!kl||kl.length<6) return null;
+              var hi=kl.map(function(k){return parseFloat(k[2]);});
+              var lo=kl.map(function(k){return parseFloat(k[3]);});
+              var cl=kl.map(function(k){return parseFloat(k[4]);});
+              var vl=kl.map(function(k){return parseFloat(k[5]);});
+              var n=cl.length;
+              var hh=hi[n-1]>hi[n-2]&&hi[n-2]>hi[n-3];
+              var hl=lo[n-1]>lo[n-2]&&lo[n-2]>lo[n-3];
+              var hlScore=(hh?1:0)+(hl?1:0);
+              var sum6=0; for(var i=n-6;i<n;i++) sum6+=cl[i];
+              var isUp=cl[n-1]>cl[n-4]&&cl[n-4]>cl[n-7];
+              var trend=(isUp?1:0)+(cl[n-1]>sum6/6?1:0);
+              var vSum=0; for(var j=0;j<vl.length-1;j++) vSum+=vl[j];
+              var vAvg=vSum/(vl.length-1);
+              var sym=t.symbol.replace('USDT','');
+              var price=parseFloat(t.lastPrice);
+              return {
+                sym:sym, price:price,
+                chg:parseFloat(t.priceChangePercent),
+                vol:parseFloat(t.quoteVolume),
+                cap:capMap[sym]||null,
+                funding:fundingMap[t.symbol]!==undefined?fundingMap[t.symbol]:null,
+                oi:null,
+                hl:hlScore, trend:trend,
+                vSpike:vl[n-1]>vAvg*1.5,
+                strong:hlScore===2&&trend===2
+              };
+            }).catch(function(){return null;});
+        });
+        Promise.all(promises).then(function(res2){
+          res2.forEach(function(r){if(r) analyzed.push(r);});
+          setTimeout(nextBatch,80);
+        });
       }
-      var batch = pool.slice(idx, idx+8);
-      idx += 8;
-      setProgress(20 + Math.round((idx/pool.length)*75));
-      st.textContent = Math.min(idx,pool.length) + '/' + pool.length + ' 분석 중...';
-
-      var promises = batch.map(function(t) {
-        return fetch('https://api.binance.com/api/v3/klines?symbol='+t.symbol+'&interval='+tf+'&limit=12')
-          .then(function(r){return r.json();})
-          .then(function(kl) {
-            if (!kl||kl.length<6) return null;
-            var hi=kl.map(function(k){return parseFloat(k[2]);});
-            var lo=kl.map(function(k){return parseFloat(k[3]);});
-            var cl=kl.map(function(k){return parseFloat(k[4]);});
-            var vl=kl.map(function(k){return parseFloat(k[5]);});
-            var n=cl.length;
-            var hh=hi[n-1]>hi[n-2]&&hi[n-2]>hi[n-3];
-            var hl=lo[n-1]>lo[n-2]&&lo[n-2]>lo[n-3];
-            var hlScore=(hh?1:0)+(hl?1:0);
-            var sum6=0; for(var i=n-6;i<n;i++) sum6+=cl[i]; var ma6=sum6/6;
-            var isUp=cl[n-1]>cl[n-4]&&cl[n-4]>cl[n-7];
-            var trend=(isUp?1:0)+(cl[n-1]>ma6?1:0);
-            var vSum=0; for(var j=0;j<vl.length-1;j++) vSum+=vl[j]; var vAvg=vSum/(vl.length-1);
-            var price = parseFloat(t.lastPrice);
-            var vol = parseFloat(t.quoteVolume);
-            var cap = price * parseFloat(t.count || 0);
-            var fsym = t.symbol.replace('USDT','') + 'USDT';
-            var funding = fundingMap[fsym] !== undefined ? fundingMap[fsym] : null;
-            return {
-              sym: t.symbol.replace('USDT',''),
-              price: price,
-              chg: parseFloat(t.priceChangePercent),
-              vol: vol,
-              cap: parseFloat(t.weightedAvgPrice) * parseFloat(t.count),
-              funding: funding,
-              oi: null,
-              hl: hlScore, trend: trend,
-              vSpike: vl[n-1]>vAvg*1.5,
-              strong: hlScore===2&&trend===2
-            };
-          }).catch(function(){return null;});
-      });
-
-      Promise.all(promises).then(function(res) {
-        res.forEach(function(r){if(r) analyzed.push(r);});
-        setTimeout(nextBatch, 80);
-      });
-    }
-    nextBatch();
+      nextBatch();
+    });
   }).catch(function(e) {
-    st.className = 'status err';
-    st.textContent = '오류: ' + e.message;
-    document.getElementById('tb').innerHTML = '<tr><td colspan="10" class="empty">로딩 실패</td></tr>';
+    st.className='status err'; st.textContent='오류: '+e.message;
+    document.getElementById('tb').innerHTML='<tr><td colspan="10" class="empty">로딩 실패</td></tr>';
     setProgress(0);
   });
 }
 
 function render() {
   var data = rows.slice();
-  if (fMode === 'hl') data = data.filter(function(d){return d.hl===2;});
-  else if (fMode === 'trend') data = data.filter(function(d){return d.trend===2&&d.hl>=1;});
-
-  var sortSel = document.getElementById('sortsel').value;
-  var sk = sKey !== 'hl' ? sKey : sortSel;
-  data.sort(function(a,b) {
-    var av=a[sk], bv=b[sk];
-    if (av===null||av===undefined) av=-Infinity;
-    if (bv===null||bv===undefined) bv=-Infinity;
+  if (fMode==='hl') data=data.filter(function(d){return d.hl===2;});
+  else if (fMode==='trend') data=data.filter(function(d){return d.trend===2&&d.hl>=1;});
+  var sk = document.getElementById('sortsel').value;
+  if (sKey!=='hl') sk=sKey;
+  data.sort(function(a,b){
+    var av=a[sk]||0, bv=b[sk]||0;
     if (sk==='sym') return sDir*String(av).localeCompare(String(bv));
     return sDir*(av-bv);
   });
-
-  var tb = document.getElementById('tb');
-  if (!data.length) { tb.innerHTML='<tr><td colspan="10" class="empty">조건에 맞는 종목 없음</td></tr>'; return; }
-
-  var html = '';
-  data.slice(0,60).forEach(function(d) {
-    var cc = d.chg>=0?'up':'dn';
-    var sign = d.chg>=0?'+':'';
-    var hlPill = d.hl===2?'<span class="pill pg">HH·HL</span>':d.hl===1?'<span class="pill py">부분</span>':'<span class="pill pr">미충족</span>';
-    var trPill = d.trend===2?'<span class="pill pg">강세</span>':d.trend===1?'<span class="pill py">중립</span>':'<span class="pill pr">약세</span>';
-    var sigs = (d.strong?'<span class="tag tag-hot">강력</span>':'') + (d.vSpike?'<span class="tag">거래량↑</span>':'');
-    var fcc = d.funding===null?'neu':d.funding>0.05?'dn':d.funding<-0.01?'up':'neu';
-    var fStr = d.funding===null?'-':(d.funding>0?'+':'')+d.funding.toFixed(4)+'%';
-    html += '<tr>';
-    html += '<td><span class="sym-link" data-sym="'+d.sym+'">'+d.sym+'</span></td>';
-    html += '<td class="neu">'+fmtPrice(d.price)+'</td>';
-    html += '<td class="'+cc+'">'+sign+d.chg.toFixed(2)+'%</td>';
-    html += '<td class="neu">'+fmtCap(d.cap)+'</td>';
-    html += '<td class="neu">'+fmtVol(d.vol)+'</td>';
-    html += '<td class="'+fcc+'">'+fStr+'</td>';
-    html += '<td class="neu">'+( d.oi ? fmtVol(d.oi) : '-' )+'</td>';
-    html += '<td>'+hlPill+'</td>';
-    html += '<td>'+trPill+'</td>';
-    html += '<td>'+(sigs||'<span class="neu">-</span>')+'</td>';
-    html += '</tr>';
+  var tb=document.getElementById('tb');
+  if (!data.length){tb.innerHTML='<tr><td colspan="10" class="empty">조건에 맞는 종목 없음</td></tr>';return;}
+  var html='';
+  data.slice(0,60).forEach(function(d){
+    var cc=d.chg>=0?'up':'dn', sign=d.chg>=0?'+':'';
+    var hlPill=d.hl===2?'<span class="pill pg">HH·HL</span>':d.hl===1?'<span class="pill py">부분</span>':'<span class="pill pr">미충족</span>';
+    var trPill=d.trend===2?'<span class="pill pg">강세</span>':d.trend===1?'<span class="pill py">중립</span>':'<span class="pill pr">약세</span>';
+    var sigs=(d.strong?'<span class="tag tag-hot">강력</span>':'')+(d.vSpike?'<span class="tag">거래량↑</span>':'');
+    var fcc=d.funding===null?'neu':d.funding>0.05?'dn':d.funding<-0.01?'up':'neu';
+    var fStr=d.funding===null?'-':(d.funding>0?'+':'')+d.funding.toFixed(4)+'%';
+    html+='<tr>';
+    html+='<td><span class="sym-link" data-sym="'+d.sym+'">'+d.sym+'</span></td>';
+    html+='<td class="neu">'+fmtPrice(d.price)+'</td>';
+    html+='<td class="'+cc+'">'+sign+d.chg.toFixed(2)+'%</td>';
+    html+='<td class="neu">'+(d.cap?fmtBig(d.cap):'-')+'</td>';
+    html+='<td class="neu">'+fmtBig(d.vol)+'</td>';
+    html+='<td class="'+fcc+'">'+fStr+'</td>';
+    html+='<td class="neu">-</td>';
+    html+='<td>'+hlPill+'</td>';
+    html+='<td>'+trPill+'</td>';
+    html+='<td>'+(sigs||'<span class="neu">-</span>')+'</td>';
+    html+='</tr>';
   });
-  tb.innerHTML = html;
-
-  document.querySelectorAll('.sym-link').forEach(function(el) {
-    el.addEventListener('click', function(){ openChart(el.getAttribute('data-sym')); });
+  tb.innerHTML=html;
+  document.querySelectorAll('.sym-link').forEach(function(el){
+    el.addEventListener('click',function(){openChart(el.getAttribute('data-sym'));});
   });
 }
 
-/* ---- CHART ---- */
-function calcMA(arr, p) {
-  return arr.map(function(_,i) {
-    if (i < p-1) return null;
+/* ---- CHART MATH ---- */
+function calcMA(arr,p){
+  return arr.map(function(_,i){
+    if(i<p-1) return null;
     var s=0; for(var j=i-p+1;j<=i;j++) s+=arr[j]; return s/p;
   });
 }
-
-function calcBB(arr, p, m) {
+function calcBB(arr,p,m){
   var mid=calcMA(arr,p);
-  return arr.map(function(_,i) {
-    if (mid[i]===null) return null;
+  return arr.map(function(_,i){
+    if(mid[i]===null) return null;
     var s=0; for(var j=i-p+1;j<=i;j++) s+=Math.pow(arr[j]-mid[i],2);
     var std=Math.sqrt(s/p);
-    return { mid: mid[i], upper: mid[i]+m*std, lower: mid[i]-m*std };
+    return {mid:mid[i],upper:mid[i]+m*std,lower:mid[i]-m*std};
   });
 }
-
-function calcRSI(arr, p) {
-  if (arr.length < p+1) return arr.map(function(){return null;});
-  var res=[]; var ag=0; var al=0;
-  for(var i=1;i<=p;i++){var d=arr[i]-arr[i-1]; if(d>0)ag+=d; else al-=d;}
-  ag/=p; al/=p;
+function calcRSI(arr,p){
+  if(arr.length<p+1) return arr.map(function(){return null;});
+  var res=[],ag=0,al=0;
+  for(var i=1;i<=p;i++){var d=arr[i]-arr[i-1];if(d>0)ag+=d;else al-=d;}
+  ag/=p;al/=p;
   for(var k=0;k<p;k++) res.push(null);
   res.push(100-100/(1+(al===0?1000:ag/al)));
   for(var i=p+1;i<arr.length;i++){
-    var d=arr[i]-arr[i-1]; var g=d>0?d:0; var l=d<0?-d:0;
-    ag=(ag*(p-1)+g)/p; al=(al*(p-1)+l)/p;
+    var d=arr[i]-arr[i-1],g=d>0?d:0,l=d<0?-d:0;
+    ag=(ag*(p-1)+g)/p;al=(al*(p-1)+l)/p;
     res.push(100-100/(1+(al===0?1000:ag/al)));
   }
   return res;
 }
-
-function detectDiv(cl, rsi, lb) {
+function detectDiv(cl,rsi,lb){
   var n=cl.length; if(n<lb+1) return null;
-  var rr=rsi[n-1]; var pr=rsi[n-1-lb];
+  var rr=rsi[n-1],pr=rsi[n-1-lb];
   if(rr===null||pr===null) return null;
   if(cl[n-1]<cl[n-1-lb]&&rr>pr) return 'bull';
   if(cl[n-1]>cl[n-1-lb]&&rr<pr) return 'bear';
   return null;
 }
 
-function destroyCharts() {
-  if(mainChart){try{mainChart.remove();}catch(e){} mainChart=null;}
-  if(volChart){try{volChart.remove();}catch(e){} volChart=null;}
-  if(rsiChart){try{rsiChart.remove();}catch(e){} rsiChart=null;}
+/* ---- CHART ---- */
+function destroyCharts(){
+  if(mainChart){try{mainChart.remove();}catch(e){}mainChart=null;}
+  if(volChart){try{volChart.remove();}catch(e){}volChart=null;}
+  if(rsiChart){try{rsiChart.remove();}catch(e){}rsiChart=null;}
   candleSeries=null; drawnSeries=[]; drawnPriceLines=[]; trendPoints=[];
+  var ov=document.getElementById('draw-overlay');
+  ov.style.display='none';
+  var ctx=ov.getContext('2d'); ctx.clearRect(0,0,ov.width,ov.height);
+  overlayLines=[];
 }
 
-function openChart(sym) {
-  currentSym = sym;
-  currentTf = '1w';
-  document.getElementById('scanner-view').style.display = 'none';
-  document.getElementById('chart-view').style.display = 'block';
-  document.getElementById('c-sym').textContent = sym+'/USDT';
-  var row = rows.find(function(r){return r.sym===sym;});
-  if (row) {
-    document.getElementById('c-price').textContent = fmtPrice(row.price);
+function openChart(sym){
+  currentSym=sym; currentTf='1w';
+  document.getElementById('scanner-view').style.display='none';
+  document.getElementById('chart-view').style.display='block';
+  document.getElementById('c-sym').textContent=sym+'/USDT';
+  var row=rows.find(function(r){return r.sym===sym;});
+  if(row){
+    document.getElementById('c-price').textContent=fmtPrice(row.price);
     var el=document.getElementById('c-chg');
     el.textContent=(row.chg>=0?'+':'')+row.chg.toFixed(2)+'%';
     el.className='chart-chg '+(row.chg>=0?'up':'dn');
-    document.getElementById('m-vol').textContent = fmtVol(row.vol);
-    document.getElementById('m-cap').textContent = fmtCap(row.cap);
-    var fEl = document.getElementById('m-funding');
-    if (row.funding !== null) {
-      fEl.textContent = (row.funding>0?'+':'')+row.funding.toFixed(4)+'%';
-      fEl.className = 'meta-val '+(row.funding>0.05?'dn':row.funding<-0.01?'up':'neu');
-    } else { fEl.textContent='-'; fEl.className='meta-val neu'; }
+    document.getElementById('m-vol').textContent=fmtBig(row.vol);
+    document.getElementById('m-cap').textContent=row.cap?fmtBig(row.cap):'-';
+    var fEl=document.getElementById('m-funding');
+    if(row.funding!==null){
+      fEl.textContent=(row.funding>0?'+':'')+row.funding.toFixed(4)+'%';
+      fEl.className='meta-val '+(row.funding>0.05?'dn':row.funding<-0.01?'up':'neu');
+    } else {fEl.textContent='-';fEl.className='meta-val neu';}
   }
-
-  document.querySelectorAll('.tf-btn').forEach(function(b){ b.className=b.getAttribute('data-tf')==='1w'?'tf-btn on':'tf-btn'; });
+  document.querySelectorAll('.tf-btn').forEach(function(b){b.className=b.getAttribute('data-tf')==='1w'?'tf-btn on':'tf-btn';});
   setActiveTool('cursor');
 
-  // Load OI and LS ratio
+  // OI + LS
   Promise.all([
     fetch('https://fapi.binance.com/fapi/v1/openInterest?symbol='+sym+'USDT').then(function(r){return r.json();}).catch(function(){return null;}),
     fetch('https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol='+sym+'USDT&period=5m&limit=1').then(function(r){return r.json();}).catch(function(){return null;})
-  ]).then(function(res) {
-    var oi=res[0]; var ls=res[1];
-    if (oi&&oi.openInterest) {
-      var oiVal = parseFloat(oi.openInterest)*parseFloat(oi.openInterest||0);
-      document.getElementById('m-oi').textContent = fmtVol(parseFloat(oi.openInterest)*rows.find(function(r){return r.sym===sym;}).price) || '-';
+  ]).then(function(res){
+    var oi=res[0],ls=res[1];
+    if(oi&&oi.openInterest){
+      var row2=rows.find(function(r){return r.sym===sym;});
+      var oiUsd=parseFloat(oi.openInterest)*(row2?row2.price:0);
+      document.getElementById('m-oi').textContent=fmtBig(oiUsd);
     }
-    if (ls&&Array.isArray(ls)&&ls[0]) {
-      var lsVal = parseFloat(ls[0].longShortRatio);
-      var lPct = parseFloat(ls[0].longAccount)*100;
-      var sPct = parseFloat(ls[0].shortAccount)*100;
-      document.getElementById('m-ls').textContent = 'L '+lPct.toFixed(1)+'% / S '+sPct.toFixed(1)+'%';
+    if(ls&&Array.isArray(ls)&&ls[0]){
+      var lPct=parseFloat(ls[0].longAccount)*100;
+      var sPct=parseFloat(ls[0].shortAccount)*100;
+      var lsEl=document.getElementById('m-ls');
+      lsEl.textContent='L '+lPct.toFixed(1)+'% / S '+sPct.toFixed(1)+'%';
+      lsEl.className='meta-val '+(lPct>60?'up':lPct<40?'dn':'neu');
     }
   });
 
-  loadChart(sym, '1w');
+  loadChart(sym,'1w');
   loadNews(sym);
 }
 
-function loadChart(sym, tf) {
-  currentTf = tf;
+function loadChart(sym,tf){
+  currentTf=tf;
   destroyCharts();
-  var loadEl = document.getElementById('chart-loading');
+  var loadEl=document.getElementById('chart-loading');
   loadEl.style.display='block'; loadEl.textContent='차트 불러오는 중...';
   document.getElementById('vol-chart-container').style.display='none';
   document.getElementById('rsi-chart-container').style.display='none';
-
   fetch('https://api.binance.com/api/v3/klines?symbol='+sym+'USDT&interval='+tf+'&limit=300')
     .then(function(r){return r.json();})
-    .then(function(klines) {
+    .then(function(klines){
       loadEl.style.display='none';
       document.getElementById('vol-chart-container').style.display='block';
       document.getElementById('rsi-chart-container').style.display='block';
       buildCharts(klines);
     })
-    .catch(function(e){ loadEl.textContent='오류: '+e.message; });
+    .catch(function(e){loadEl.textContent='오류: '+e.message;});
 }
 
-function buildCharts(klines) {
-  var W = document.getElementById('main-chart-container').clientWidth || window.innerWidth-40;
-  var closes = klines.map(function(k){return parseFloat(k[4]);});
-  var ma7=calcMA(closes,7), ma50=calcMA(closes,50), ma200=calcMA(closes,200);
+function buildCharts(klines){
+  var W=document.getElementById('main-chart-container').clientWidth||window.innerWidth-40;
+  var closes=klines.map(function(k){return parseFloat(k[4]);});
+  var ma7=calcMA(closes,7),ma50=calcMA(closes,50),ma200=calcMA(closes,200);
   var bb=calcBB(closes,20,2);
   var rsiArr=calcRSI(closes,14);
   var div=detectDiv(closes,rsiArr,20);
-
   var badge=document.getElementById('div-badge');
   if(div==='bull'){badge.style.display='inline-block';badge.className='div-badge div-bull';badge.textContent='▲ 상승 다이버전스';}
   else if(div==='bear'){badge.style.display='inline-block';badge.className='div-badge div-bear';badge.textContent='▼ 하락 다이버전스';}
   else badge.style.display='none';
 
-  var baseOpts = {
+  var baseOpts={
     layout:{background:{color:'#111118'},textColor:'#6b6b80'},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
-    crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'rgba(255,255,255,0.3)',labelBackgroundColor:'#333'},horzLine:{color:'rgba(255,255,255,0.3)',labelBackgroundColor:'#333'}},
+    crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'rgba(255,255,255,0.35)',labelBackgroundColor:'#2a2a3a'},horzLine:{color:'rgba(255,255,255,0.35)',labelBackgroundColor:'#2a2a3a'}},
     rightPriceScale:{borderColor:'#222230'},
     timeScale:{borderColor:'#222230',timeVisible:true},
-    handleScroll:true, handleScale:true
+    handleScroll:true,handleScale:true
   };
 
-  var mainOpts = Object.assign({}, baseOpts, {width:W, height:440});
-  mainChart = LightweightCharts.createChart(document.getElementById('main-chart-container'), mainOpts);
-
-  candleSeries = mainChart.addCandlestickSeries({
-    upColor:'#00f5a0', downColor:'#ff4d6a',
-    borderUpColor:'#00f5a0', borderDownColor:'#ff4d6a',
-    wickUpColor:'#00f5a0', wickDownColor:'#ff4d6a',
-    priceFormat:{type:'price', precision:8, minMove:0.00000001}
+  mainChart=LightweightCharts.createChart(document.getElementById('main-chart-container'),Object.assign({},baseOpts,{width:W,height:440}));
+  candleSeries=mainChart.addCandlestickSeries({
+    upColor:'#00f5a0',downColor:'#ff4d6a',
+    borderUpColor:'#00f5a0',borderDownColor:'#ff4d6a',
+    wickUpColor:'#00f5a0',wickDownColor:'#ff4d6a',
+    priceFormat:{type:'custom',formatter:function(p){return fmtPrice(p);},minMove:0.000000001}
   });
   candleSeries.setData(klines.map(function(k){
     return {time:Math.floor(k[0]/1000),open:parseFloat(k[1]),high:parseFloat(k[2]),low:parseFloat(k[3]),close:parseFloat(k[4])};
   }));
 
-  function addLine(data, color, lw) {
-    var s=mainChart.addLineSeries({color:color,lineWidth:lw,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});
+  function addLine(data,color,lw){
+    var s=mainChart.addLineSeries({color:color,lineWidth:lw,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false,priceFormat:{type:'custom',formatter:function(p){return fmtPrice(p);}}});
     s.setData(data.map(function(v,i){return v!==null?{time:Math.floor(klines[i][0]/1000),value:v}:null;}).filter(Boolean));
     return s;
   }
-
-  var bbUpper=bb.map(function(b){return b?b.upper:null;});
-  var bbLower=bb.map(function(b){return b?b.lower:null;});
-  var bbMid=bb.map(function(b){return b?b.mid:null;});
-  addLine(bbUpper,'rgba(140,140,140,0.4)',1);
-  addLine(bbLower,'rgba(140,140,140,0.4)',1);
-  addLine(bbMid,'rgba(140,140,140,0.25)',1);
+  addLine(bb.map(function(b){return b?b.upper:null;}),'rgba(140,140,140,0.4)',1);
+  addLine(bb.map(function(b){return b?b.lower:null;}),'rgba(140,140,140,0.4)',1);
+  addLine(bb.map(function(b){return b?b.mid:null;}),'rgba(140,140,140,0.25)',1);
   addLine(ma200,'#ffd700',1.5);
   addLine(ma50,'#ff8800',1.5);
   addLine(ma7,'#ff4444',1.5);
 
-  /* VOL */
-  var volOpts = Object.assign({}, baseOpts, {width:W, height:100, timeScale:{visible:false,borderColor:'#222230'}});
-  volChart = LightweightCharts.createChart(document.getElementById('vol-chart-container'), volOpts);
-  var volSeries = volChart.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:''});
+  // VOL
+  volChart=LightweightCharts.createChart(document.getElementById('vol-chart-container'),Object.assign({},baseOpts,{width:W,height:100,timeScale:{visible:false,borderColor:'#222230'}}));
+  var volS=volChart.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:''});
   volChart.priceScale('').applyOptions({scaleMargins:{top:0.1,bottom:0}});
-  volSeries.setData(klines.map(function(k){
-    return {time:Math.floor(k[0]/1000),value:parseFloat(k[5]),color:parseFloat(k[4])>=parseFloat(k[1])?'rgba(0,245,160,0.5)':'rgba(255,77,106,0.5)'};
-  }));
+  volS.setData(klines.map(function(k){return {time:Math.floor(k[0]/1000),value:parseFloat(k[5]),color:parseFloat(k[4])>=parseFloat(k[1])?'rgba(0,245,160,0.5)':'rgba(255,77,106,0.5)';};}));
 
-  /* RSI */
-  var rsiOpts = Object.assign({}, baseOpts, {width:W, height:120, timeScale:{visible:false,borderColor:'#222230'}});
-  rsiChart = LightweightCharts.createChart(document.getElementById('rsi-chart-container'), rsiOpts);
-  var rsiSeries = rsiChart.addLineSeries({lineWidth:1.5,priceLineVisible:false,lastValueVisible:true,color:'#00c8ff'});
-  rsiSeries.setData(klines.map(function(k,i){return rsiArr[i]!==null?{time:Math.floor(k[0]/1000),value:rsiArr[i]}:null;}).filter(Boolean));
+  // RSI
+  rsiChart=LightweightCharts.createChart(document.getElementById('rsi-chart-container'),Object.assign({},baseOpts,{width:W,height:120,timeScale:{visible:false,borderColor:'#222230'}}));
+  var rsiS=rsiChart.addLineSeries({lineWidth:1.5,priceLineVisible:false,lastValueVisible:true,color:'#00c8ff'});
+  rsiS.setData(klines.map(function(k,i){return rsiArr[i]!==null?{time:Math.floor(k[0]/1000),value:rsiArr[i]}:null;}).filter(Boolean));
+  function addRL(v,c){var s=rsiChart.addLineSeries({color:c,lineWidth:1,priceLineVisible:false,lastValueVisible:false});s.setData(klines.map(function(k){return {time:Math.floor(k[0]/1000),value:v};}));}
+  addRL(70,'rgba(255,77,106,0.35)'); addRL(50,'rgba(255,255,255,0.1)'); addRL(30,'rgba(0,245,160,0.35)');
 
-  function addRsiLine(val, color) {
-    var s=rsiChart.addLineSeries({color:color,lineWidth:1,priceLineVisible:false,lastValueVisible:false});
-    s.setData(klines.map(function(k){return {time:Math.floor(k[0]/1000),value:val};}));
+  // SYNC
+  mainChart.timeScale().subscribeVisibleLogicalRangeChange(function(r){if(r){volChart.timeScale().setVisibleLogicalRange(r);rsiChart.timeScale().setVisibleLogicalRange(r);}});
+  volChart.timeScale().subscribeVisibleLogicalRangeChange(function(r){if(r){mainChart.timeScale().setVisibleLogicalRange(r);rsiChart.timeScale().setVisibleLogicalRange(r);}});
+
+  // OVERLAY for drawing
+  var ov=document.getElementById('draw-overlay');
+  ov.width=W; ov.height=440;
+  ov.style.display='none';
+  overlayLines=[];
+
+  // Subscribe crosshair for overlay redraw
+  mainChart.subscribeCrosshairMove(function(){
+    if(activeTool!=='cursor') redrawOverlay();
+  });
+}
+
+/* ---- DRAWING OVERLAY ---- */
+function setActiveTool(tool){
+  activeTool=tool;
+  ['cursor','hline','tline'].forEach(function(t){
+    document.getElementById('tool-'+t).className=t===tool?'tool-btn on':'tool-btn';
+  });
+  var hints={cursor:'커서 모드',hline:'차트 클릭 → 수평선 그리기',tline:'첫 번째 점 클릭...'};
+  document.getElementById('tool-hint').textContent=hints[tool]||'';
+  var ov=document.getElementById('draw-overlay');
+  if(tool==='cursor'){
+    ov.style.display='none'; ov.style.cursor='default';
+    trendPoints=[];
+  } else {
+    ov.style.display='block'; ov.style.cursor='crosshair';
   }
-  addRsiLine(70,'rgba(255,77,106,0.35)');
-  addRsiLine(50,'rgba(255,255,255,0.1)');
-  addRsiLine(30,'rgba(0,245,160,0.35)');
+  redrawOverlay();
+}
 
-  /* SYNC */
-  mainChart.timeScale().subscribeVisibleLogicalRangeChange(function(r){
-    if(r){volChart.timeScale().setVisibleLogicalRange(r);rsiChart.timeScale().setVisibleLogicalRange(r);}
-  });
-  volChart.timeScale().subscribeVisibleLogicalRangeChange(function(r){
-    if(r){mainChart.timeScale().setVisibleLogicalRange(r);rsiChart.timeScale().setVisibleLogicalRange(r);}
-  });
-
-  /* DRAWING */
-  var mainEl = document.getElementById('main-chart-container');
-  mainEl.addEventListener('click', function(e) {
-    if (activeTool === 'hline') {
-      var rect = mainEl.getBoundingClientRect();
-      var price = mainChart.priceScale('right').coordinateToPrice(e.clientY - rect.top);
-      if (price !== null) {
-        var pl = candleSeries.createPriceLine({price:price,color:'#00c8ff',lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,axisLabelVisible:true,title:fmtPrice(price)});
-        drawnPriceLines.push(pl);
-      }
-    } else if (activeTool === 'tline') {
-      var rect = mainEl.getBoundingClientRect();
-      var price = mainChart.priceScale('right').coordinateToPrice(e.clientY - rect.top);
-      var time = mainChart.timeScale().coordinateToTime(e.clientX - rect.left);
-      if (price !== null && time !== null) {
-        trendPoints.push({time:time, value:price});
-        document.getElementById('tool-hint').textContent = trendPoints.length===1 ? '두 번째 점 클릭...' : '커서 모드';
-        if (trendPoints.length === 2) {
-          var pts = trendPoints.slice().sort(function(a,b){return a.time-b.time;});
-          var ts = mainChart.addLineSeries({color:'#ffd700',lineWidth:1,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});
-          ts.setData(pts);
-          drawnSeries.push(ts);
-          trendPoints = [];
-        }
-      }
+function redrawOverlay(){
+  var ov=document.getElementById('draw-overlay');
+  if(!ov||ov.style.display==='none') return;
+  var ctx=ov.getContext('2d');
+  ctx.clearRect(0,0,ov.width,ov.height);
+  // draw saved lines
+  overlayLines.forEach(function(line){
+    ctx.beginPath();
+    ctx.strokeStyle=line.color||'#00c8ff';
+    ctx.lineWidth=1.5;
+    ctx.setLineDash(line.dash||[]);
+    if(line.type==='h'){
+      ctx.moveTo(0,line.y); ctx.lineTo(ov.width,line.y);
+    } else if(line.type==='t'&&line.x1!==undefined){
+      ctx.moveTo(line.x1,line.y1); ctx.lineTo(line.x2,line.y2);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+    if(line.type==='h'){
+      ctx.fillStyle='#00c8ff'; ctx.font='10px monospace';
+      ctx.fillText(line.label||'',ov.width-80,line.y-4);
     }
   });
+  // draw in-progress trendpoint
+  if(activeTool==='tline'&&trendPoints.length===1){
+    ctx.beginPath(); ctx.strokeStyle='rgba(255,215,0,0.5)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+    ctx.arc(trendPoints[0].x,trendPoints[0].y,4,0,Math.PI*2); ctx.stroke();
+    ctx.setLineDash([]);
+  }
 }
 
-function setActiveTool(tool) {
-  activeTool = tool;
-  ['cursor','hline','tline'].forEach(function(t){
-    document.getElementById('tool-'+t).className = t===tool ? 'tool-btn on' : 'tool-btn';
-  });
-  var hint = {cursor:'커서 모드', hline:'차트 클릭 → 수평선', tline:'첫 번째 점 클릭...'};
-  document.getElementById('tool-hint').textContent = hint[tool] || '';
-  var mainEl = document.getElementById('main-chart-container');
-  if (mainEl) mainEl.style.cursor = tool==='cursor' ? 'default' : 'crosshair';
-}
+document.getElementById('draw-overlay').addEventListener('click',function(e){
+  if(!mainChart) return;
+  var ov=document.getElementById('draw-overlay');
+  var rect=ov.getBoundingClientRect();
+  var x=e.clientX-rect.left;
+  var y=e.clientY-rect.top;
+
+  if(activeTool==='hline'){
+    var price=mainChart.priceScale('right').coordinateToPrice(y);
+    if(price!==null){
+      overlayLines.push({type:'h',y:y,color:'#00c8ff',dash:[4,4],label:fmtPrice(price)});
+      // Also add to chart for proper price interaction
+      var pl=candleSeries.createPriceLine({price:price,color:'rgba(0,200,255,0.6)',lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,axisLabelVisible:true,title:fmtPrice(price)});
+      drawnPriceLines.push(pl);
+      redrawOverlay();
+    }
+  } else if(activeTool==='tline'){
+    var price=mainChart.priceScale('right').coordinateToPrice(y);
+    var time=mainChart.timeScale().coordinateToTime(x);
+    if(price!==null&&time!==null){
+      trendPoints.push({x:x,y:y,price:price,time:time});
+      if(trendPoints.length===2){
+        var p1=trendPoints[0],p2=trendPoints[1];
+        overlayLines.push({type:'t',x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,color:'#ffd700'});
+        // extend line across chart
+        var dx=p2.x-p1.x,dy=p2.y-p1.y;
+        if(dx!==0){
+          var slope=dy/dx;
+          var x0=0,xW=ov.width;
+          var y0=p1.y+slope*(x0-p1.x);
+          var yW=p1.y+slope*(xW-p1.x);
+          overlayLines[overlayLines.length-1]={type:'t',x1:x0,y1:y0,x2:xW,y2:yW,color:'#ffd700'};
+        }
+        trendPoints=[];
+        document.getElementById('tool-hint').textContent='추세선 완료. 계속 그리려면 클릭.';
+        redrawOverlay();
+      } else {
+        document.getElementById('tool-hint').textContent='두 번째 점 클릭...';
+        redrawOverlay();
+      }
+    }
+  }
+});
 
 /* ---- NEWS ---- */
-function loadNews(sym) {
-  document.getElementById('news-title').textContent = sym + ' 관련 뉴스 불러오는 중...';
-  document.getElementById('news-list').innerHTML = '';
-
+function loadNews(sym){
+  document.getElementById('news-title').textContent=sym+' 뉴스 불러오는 중...';
+  document.getElementById('news-list').innerHTML='';
   fetch('https://cryptopanic.com/api/v1/posts/?auth_token=anonymous&currencies='+sym+'&public=true')
     .then(function(r){return r.json();})
-    .then(function(data) {
-      if (!data.results || !data.results.length) {
-        document.getElementById('news-title').textContent = sym + ' 뉴스 없음';
-        return;
-      }
-      document.getElementById('news-title').textContent = sym + ' 최근 뉴스 · ' + data.results.length + '건';
-      var html = '';
-      data.results.slice(0,8).forEach(function(item) {
-        var d = new Date(item.published_at);
-        var ts = (d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
-        var sentiment = item.votes ? (item.votes.positive > item.votes.negative ? 'news-bull' : item.votes.negative > item.votes.positive ? 'news-bear' : 'news-neu') : 'news-neu';
-        var sentIcon = sentiment==='news-bull'?'▲':sentiment==='news-bear'?'▼':'·';
-        html += '<div class="news-item">';
-        html += '<div class="news-head"><span class="'+sentiment+'">'+sentIcon+'</span> <a href="'+item.url+'" target="_blank">'+item.title+'</a></div>';
-        html += '<div class="news-meta">'+ts+' · '+item.source.title+'</div>';
-        html += '</div>';
+    .then(function(data){
+      if(!data.results||!data.results.length){document.getElementById('news-title').textContent=sym+' 뉴스 없음';return;}
+      document.getElementById('news-title').textContent=sym+' 최근 뉴스 · '+data.results.length+'건';
+      var html='';
+      data.results.slice(0,8).forEach(function(item){
+        var d=new Date(item.published_at);
+        var ts=(d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
+        var s=item.votes?(item.votes.positive>item.votes.negative?'bull':item.votes.negative>item.votes.positive?'bear':'neu'):'neu';
+        html+='<div class="news-item"><div class="news-head"><span class="news-'+s+'">'+(s==='bull'?'▲':s==='bear'?'▼':'·')+'</span> <a href="'+item.url+'" target="_blank">'+item.title+'</a></div><div class="news-meta">'+ts+' · '+item.source.title+'</div></div>';
       });
-      document.getElementById('news-list').innerHTML = html;
+      document.getElementById('news-list').innerHTML=html;
     })
-    .catch(function() {
-      document.getElementById('news-title').textContent = sym + ' 뉴스 로딩 실패 (CORS 제한)';
-      document.getElementById('news-list').innerHTML = '<div class="news-item"><div class="news-meta" style="color:#6b6b80">CryptoPanic은 직접 접속이 필요합니다. <a href="https://cryptopanic.com/news/'+sym+'/" target="_blank" style="color:#00c8ff">cryptopanic.com에서 보기 →</a></div></div>';
+    .catch(function(){
+      document.getElementById('news-title').textContent=sym+' 뉴스';
+      document.getElementById('news-list').innerHTML='<div class="news-item"><div class="news-meta"><a href="https://cryptopanic.com/news/'+sym+'/" target="_blank" style="color:#00c8ff">CryptoPanic에서 '+sym+' 뉴스 보기 →</a></div></div>';
     });
 }
 
 /* ---- EVENTS ---- */
-document.getElementById('btn-hl').addEventListener('click', function(){setFilter('hl');});
-document.getElementById('btn-trend').addEventListener('click', function(){setFilter('trend');});
-document.getElementById('btn-all').addEventListener('click', function(){setFilter('all');});
-document.getElementById('btn-refresh').addEventListener('click', function(){load();});
-document.getElementById('sortsel').addEventListener('change', function(){render();});
-document.getElementById('back-btn').addEventListener('click', function(){
+document.getElementById('btn-hl').addEventListener('click',function(){setFilter('hl');});
+document.getElementById('btn-trend').addEventListener('click',function(){setFilter('trend');});
+document.getElementById('btn-all').addEventListener('click',function(){setFilter('all');});
+document.getElementById('btn-refresh').addEventListener('click',function(){load();});
+document.getElementById('sortsel').addEventListener('change',function(){render();});
+document.getElementById('back-btn').addEventListener('click',function(){
   destroyCharts();
   document.getElementById('chart-view').style.display='none';
   document.getElementById('scanner-view').style.display='block';
 });
-document.getElementById('tool-cursor').addEventListener('click', function(){setActiveTool('cursor');});
-document.getElementById('tool-hline').addEventListener('click', function(){setActiveTool('hline');});
-document.getElementById('tool-tline').addEventListener('click', function(){setActiveTool('tline');});
-document.getElementById('tool-clear').addEventListener('click', function(){
+document.getElementById('tool-cursor').addEventListener('click',function(){setActiveTool('cursor');});
+document.getElementById('tool-hline').addEventListener('click',function(){setActiveTool('hline');});
+document.getElementById('tool-tline').addEventListener('click',function(){setActiveTool('tline');});
+document.getElementById('tool-clear').addEventListener('click',function(){
+  overlayLines=[];
   drawnSeries.forEach(function(s){try{mainChart.removeSeries(s);}catch(e){}});
   drawnPriceLines.forEach(function(pl){try{candleSeries.removePriceLine(pl);}catch(e){}});
   drawnSeries=[]; drawnPriceLines=[]; trendPoints=[];
-  document.getElementById('tool-hint').textContent='커서 모드';
+  redrawOverlay();
+  document.getElementById('tool-hint').textContent=activeTool==='tline'?'첫 번째 점 클릭...':activeTool==='hline'?'차트 클릭 → 수평선 그리기':'커서 모드';
 });
-
 document.querySelectorAll('th[data-key]').forEach(function(th){
-  th.addEventListener('click', function(){sortBy(th.getAttribute('data-key'));});
+  th.addEventListener('click',function(){sortBy(th.getAttribute('data-key'));});
 });
-
 document.querySelectorAll('.tf-btn').forEach(function(btn){
-  btn.addEventListener('click', function(){
+  btn.addEventListener('click',function(){
     var tf=btn.getAttribute('data-tf');
     document.querySelectorAll('.tf-btn').forEach(function(b){b.className='tf-btn';});
     btn.className='tf-btn on';
-    loadChart(currentSym, tf);
+    loadChart(currentSym,tf);
   });
 });
-
-window.addEventListener('resize', function(){
-  if(mainChart) mainChart.applyOptions({width:document.getElementById('main-chart-container').clientWidth});
+window.addEventListener('resize',function(){
+  if(mainChart){var w=document.getElementById('main-chart-container').clientWidth;mainChart.applyOptions({width:w});var ov=document.getElementById('draw-overlay');ov.width=w;}
   if(volChart) volChart.applyOptions({width:document.getElementById('vol-chart-container').clientWidth});
   if(rsiChart) rsiChart.applyOptions({width:document.getElementById('rsi-chart-container').clientWidth});
 });
