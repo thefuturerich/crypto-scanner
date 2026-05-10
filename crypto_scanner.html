@@ -22,15 +22,13 @@ select{background:#1a1a24;border:1px solid #2a2a3a;color:#e8e8f0;font-family:mon
 .mc{background:#111118;border:1px solid #222230;border-radius:10px;padding:12px 14px;}
 .mc-l{font-size:10px;color:#6b6b80;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;}
 .mc-v{font-size:22px;font-weight:bold;color:#e8e8f0;}
-.mc-v.green{color:#00f5a0;}
-.mc-v.sm{font-size:12px;}
+.mc-v.green{color:#00f5a0;} .mc-v.sm{font-size:12px;}
 .prog-wrap{height:2px;background:#1a1a24;border-radius:2px;margin-bottom:10px;}
 .prog{height:100%;width:0%;background:#00f5a0;border-radius:2px;transition:width 0.3s;}
 .status{font-size:11px;color:#6b6b80;margin-bottom:12px;}
-.status.loading{color:#00f5a0;}
-.status.err{color:#ff4d6a;}
+.status.loading{color:#00f5a0;} .status.err{color:#ff4d6a;}
 .table-wrap{background:#111118;border:1px solid #222230;border-radius:10px;overflow:hidden;overflow-x:auto;}
-table{width:100%;border-collapse:collapse;font-size:12px;min-width:900px;}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:950px;}
 thead{background:#1a1a24;}
 th{text-align:left;padding:10px 12px;font-size:10px;color:#6b6b80;text-transform:uppercase;letter-spacing:1px;cursor:pointer;white-space:nowrap;border-bottom:1px solid #222230;user-select:none;}
 th:hover{color:#00f5a0;}
@@ -46,6 +44,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .pr{background:rgba(255,77,106,0.1);color:#ff4d6a;border:1px solid rgba(255,77,106,0.3);}
 .tag{display:inline-block;font-size:9px;padding:1px 6px;border-radius:99px;margin-left:3px;background:rgba(0,200,255,0.1);color:#00c8ff;border:1px solid rgba(0,200,255,0.25);}
 .tag-hot{background:rgba(255,77,106,0.1);color:#ff4d6a;border-color:rgba(255,77,106,0.3);}
+.tag-fut{background:rgba(255,165,0,0.12);color:#ffa500;border:1px solid rgba(255,165,0,0.3);}
 .empty{text-align:center;padding:40px;color:#6b6b80;}
 #chart-view{display:none;padding:16px;}
 .chart-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
@@ -75,9 +74,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .div-bull{background:rgba(0,245,160,0.15);color:#00f5a0;border:1px solid rgba(0,245,160,0.4);}
 .div-bear{background:rgba(255,77,106,0.15);color:#ff4d6a;border:1px solid rgba(255,77,106,0.4);}
 .chart-outer{position:relative;margin-bottom:8px;background:#111118;border:1px solid #222230;border-radius:10px;overflow:hidden;}
-#draw-canvas{position:absolute;top:0;left:0;z-index:20;pointer-events:none;}
-#draw-canvas.active{pointer-events:all;cursor:crosshair;}
-#vol-chart-container,#rsi-chart-container,#oi-chart-container{background:#111118;border:1px solid #222230;border-radius:10px;margin-bottom:8px;overflow:hidden;position:relative;}
+#vol-chart-container,#oi-chart-container,#rsi-chart-container{background:#111118;border:1px solid #222230;border-radius:10px;margin-bottom:8px;overflow:hidden;position:relative;}
 .chart-sub-label{position:absolute;top:7px;left:10px;font-size:10px;color:#6b6b80;z-index:5;pointer-events:none;}
 .loading-chart{text-align:center;padding:60px;color:#6b6b80;font-size:13px;}
 .news-section{background:#111118;border:1px solid #222230;border-radius:10px;padding:14px;margin-bottom:8px;}
@@ -93,7 +90,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 </head>
 <body>
 <div id="scanner-view">
-  <div style="padding:20px 20px 0"><h1>TREND SCAN</h1><div class="sub">HH/HL Scanner - Binance Live (Spot+Futures) - Click symbol for chart</div></div>
+  <div style="padding:20px 20px 0"><h1>TREND SCAN</h1><div class="sub">HH/HL Scanner - Binance Live - Click symbol for chart</div></div>
   <div style="padding:0 20px 20px">
     <div class="controls">
       <label>TF</label>
@@ -172,8 +169,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     <span class="tool-hint" id="tool-hint">Cursor mode</span>
   </div>
   <div class="chart-outer" id="chart-outer">
-    <div id="main-chart-container"><div class="loading-chart" id="chart-loading">Loading chart...</div></div>
-    <canvas id="draw-canvas"></canvas>
+    <div id="main-chart-container"><div class="loading-chart" id="chart-loading">Loading...</div></div>
   </div>
   <div id="vol-chart-container" style="display:none"><div class="chart-sub-label">Volume</div></div>
   <div id="oi-chart-container" style="display:none"><div class="chart-sub-label">Open Interest (USD)</div></div>
@@ -186,13 +182,14 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <script>
-var rows=[], fMode='hl', sKey='hl', sDir=-1;
-var currentSym='', currentTf='1w';
-var mainChart=null, volChart=null, rsiChart=null, oiChart=null;
+var rows=[],fMode='hl',sKey='hl',sDir=-1;
+var currentSym='',currentTf='1w';
+var mainChart=null,volChart=null,rsiChart=null,oiChart=null;
 var candleSeries=null;
 var activeTool='cursor';
-var trendPoints=[], drawnPriceLines=[], overlayLines=[];
-var capMap={};
+var trendPoints=[],drawnPriceLines=[],overlayLines=[];
+var capMap={},futuresSet={};
+var drawingKlines=[];
 
 function fmtPrice(n){
   if(n===null||n===undefined||isNaN(n)) return '-';
@@ -241,7 +238,7 @@ function load(){
   var tf=document.getElementById('tf').value;
   var minVolM=parseFloat(document.getElementById('minvol').value)*1e6;
   var st=document.getElementById('st');
-  st.className='status loading'; st.textContent='Connecting...';
+  st.className='status loading';st.textContent='Connecting...';
   document.getElementById('tb').innerHTML='<tr><td colspan="10" class="empty">Loading...</td></tr>';
   setProgress(5);
 
@@ -249,10 +246,12 @@ function load(){
     fetch('https://api.binance.com/api/v3/ticker/24hr').then(function(r){return r.json();}),
     fetch('https://fapi.binance.com/fapi/v1/premiumIndex').then(function(r){return r.json();}).catch(function(){return [];}),
     fetch('https://fapi.binance.com/fapi/v1/openInterest').then(function(r){return r.json();}).catch(function(){return [];}),
+    fetch('https://fapi.binance.com/fapi/v1/exchangeInfo').then(function(r){return r.json();}).catch(function(){return null;})
   ]).then(function(res){
     var spotTickers=res[0];
     var fundingRaw=res[1];
     var oiRaw=res[2];
+    var futInfo=res[3];
 
     var fundingMap={};
     if(Array.isArray(fundingRaw)){
@@ -262,9 +261,14 @@ function load(){
     if(Array.isArray(oiRaw)){
       oiRaw.forEach(function(o){oiMap[o.symbol]=parseFloat(o.openInterest);});
     }
+    futuresSet={};
+    if(futInfo&&futInfo.symbols){
+      futInfo.symbols.forEach(function(s){
+        if(s.contractType==='PERPETUAL') futuresSet[s.baseAsset]=true;
+      });
+    }
 
     setProgress(15);
-
     var skip=['DOWN','UP','BEAR','BULL','TUSD','USDC','BUSD','DAI','FDUSD','USDP'];
     var pool=spotTickers.filter(function(t){
       if(!t.symbol.endsWith('USDT')) return false;
@@ -276,9 +280,8 @@ function load(){
 
     var syms=pool.map(function(t){return t.symbol.replace('USDT','');});
     loadMarketCaps(syms).then(function(){
-      st.textContent='Analyzing '+pool.length+' symbols...';
+      st.textContent='Analyzing '+pool.length+'...';
       var analyzed=[],idx=0;
-
       function nextBatch(){
         if(idx>=pool.length){
           rows=analyzed;
@@ -287,14 +290,12 @@ function load(){
           document.getElementById('m3').textContent=rows.filter(function(d){return d.strong;}).length;
           document.getElementById('m4').textContent=rows.filter(function(d){return d.vSpike;}).length;
           document.getElementById('m5').textContent=new Date().toLocaleTimeString();
-          setProgress(100);
-          setTimeout(function(){setProgress(0);},800);
+          setProgress(100);setTimeout(function(){setProgress(0);},800);
           st.className='status';
           st.textContent=rows.length+' done - HH-HL: '+rows.filter(function(d){return d.hl===2;}).length;
-          render();
-          return;
+          render();return;
         }
-        var batch=pool.slice(idx,idx+8); idx+=8;
+        var batch=pool.slice(idx,idx+8);idx+=8;
         setProgress(20+Math.round((idx/pool.length)*75));
         var promises=batch.map(function(t){
           return fetch('https://api.binance.com/api/v3/klines?symbol='+t.symbol+'&interval='+tf+'&limit=12')
@@ -309,21 +310,23 @@ function load(){
               var hh=hi[n-1]>hi[n-2]&&hi[n-2]>hi[n-3];
               var hl=lo[n-1]>lo[n-2]&&lo[n-2]>lo[n-3];
               var hlScore=(hh?1:0)+(hl?1:0);
-              var sum6=0; for(var i=n-6;i<n;i++) sum6+=cl[i];
+              var sum6=0;for(var i=n-6;i<n;i++) sum6+=cl[i];
               var isUp=cl[n-1]>cl[n-4]&&cl[n-4]>cl[n-7];
               var trend=(isUp?1:0)+(cl[n-1]>sum6/6?1:0);
-              var vSum=0; for(var j=0;j<vl.length-1;j++) vSum+=vl[j];
+              var vSum=0;for(var j=0;j<vl.length-1;j++) vSum+=vl[j];
               var sym=t.symbol.replace('USDT','');
               var price=parseFloat(t.lastPrice);
               var oiQty=oiMap[t.symbol]||0;
-              return {
-                sym:sym, price:price,
+              var isFutures=!!futuresSet[sym];
+              return{
+                sym:sym,price:price,
                 chg:parseFloat(t.priceChangePercent),
                 vol:parseFloat(t.quoteVolume),
                 cap:capMap[sym]||null,
                 funding:fundingMap[t.symbol]!==undefined?fundingMap[t.symbol]:null,
                 oi:oiQty>0?oiQty*price:null,
-                hl:hlScore, trend:trend,
+                isFutures:isFutures,
+                hl:hlScore,trend:trend,
                 vSpike:vl[n-1]>vSum/(vl.length-1)*1.5,
                 strong:hlScore===2&&trend===2
               };
@@ -337,7 +340,8 @@ function load(){
       nextBatch();
     });
   }).catch(function(e){
-    st.className='status err'; st.textContent='Error: '+e.message;
+    document.getElementById('st').className='status err';
+    document.getElementById('st').textContent='Error: '+e.message;
     document.getElementById('tb').innerHTML='<tr><td colspan="10" class="empty">Failed</td></tr>';
     setProgress(0);
   });
@@ -350,7 +354,7 @@ function render(){
   var sk=document.getElementById('sortsel').value;
   if(sKey!=='hl') sk=sKey;
   data.sort(function(a,b){
-    var av=a[sk]||0, bv=b[sk]||0;
+    var av=a[sk]||0,bv=b[sk]||0;
     if(sk==='sym') return sDir*String(av).localeCompare(String(bv));
     return sDir*(av-bv);
   });
@@ -358,10 +362,10 @@ function render(){
   if(!data.length){tb.innerHTML='<tr><td colspan="10" class="empty">No results</td></tr>';return;}
   var html='';
   data.slice(0,80).forEach(function(d){
-    var cc=d.chg>=0?'up':'dn', sign=d.chg>=0?'+':'';
+    var cc=d.chg>=0?'up':'dn',sign=d.chg>=0?'+':'';
     var hlPill=d.hl===2?'<span class="pill pg">HH-HL</span>':d.hl===1?'<span class="pill py">Partial</span>':'<span class="pill pr">None</span>';
     var trPill=d.trend===2?'<span class="pill pg">Bull</span>':d.trend===1?'<span class="pill py">Neutral</span>':'<span class="pill pr">Bear</span>';
-    var sigs=(d.strong?'<span class="tag tag-hot">Strong</span>':'')+(d.vSpike?'<span class="tag">VolUp</span>':'');
+    var sigs=(d.strong?'<span class="tag tag-hot">Strong</span>':'')+(d.vSpike?'<span class="tag">VolUp</span>':'')+(d.isFutures?'<span class="tag tag-fut">Futures</span>':'');
     var fcc=d.funding===null?'neu':d.funding>0.05?'dn':d.funding<-0.01?'up':'neu';
     var fStr=d.funding===null?'-':(d.funding>0?'+':'')+d.funding.toFixed(4)+'%';
     html+='<tr>';
@@ -383,18 +387,18 @@ function render(){
   });
 }
 
-/* CHART */
+/* CHART MATH */
 function calcMA(arr,p){
   return arr.map(function(_,i){
     if(i<p-1) return null;
-    var s=0; for(var j=i-p+1;j<=i;j++) s+=arr[j]; return s/p;
+    var s=0;for(var j=i-p+1;j<=i;j++) s+=arr[j];return s/p;
   });
 }
 function calcBB(arr,p,m){
   var mid=calcMA(arr,p);
   return arr.map(function(_,i){
     if(mid[i]===null) return null;
-    var s=0; for(var j=i-p+1;j<=i;j++) s+=Math.pow(arr[j]-mid[i],2);
+    var s=0;for(var j=i-p+1;j<=i;j++) s+=Math.pow(arr[j]-mid[i],2);
     var std=Math.sqrt(s/p);
     return{mid:mid[i],upper:mid[i]+m*std,lower:mid[i]-m*std};
   });
@@ -402,7 +406,7 @@ function calcBB(arr,p,m){
 function calcRSI(arr,p){
   if(arr.length<p+1) return arr.map(function(){return null;});
   var res=[],ag=0,al=0;
-  for(var i=1;i<=p;i++){var d=arr[i]-arr[i-1];if(d>0)ag+=d;else al-=d;}
+  for(var i=1;i<=p;i++){var d=arr[i]-arr[i-1];if(d>0) ag+=d;else al-=d;}
   ag/=p;al/=p;
   for(var k=0;k<p;k++) res.push(null);
   res.push(100-100/(1+(al===0?1000:ag/al)));
@@ -414,7 +418,7 @@ function calcRSI(arr,p){
   return res;
 }
 function detectDiv(cl,rsi,lb){
-  var n=cl.length; if(n<lb+1) return null;
+  var n=cl.length;if(n<lb+1) return null;
   var rr=rsi[n-1],pr=rsi[n-1-lb];
   if(rr===null||pr===null) return null;
   if(cl[n-1]<cl[n-1-lb]&&rr>pr) return 'bull';
@@ -427,14 +431,11 @@ function destroyCharts(){
   if(volChart){try{volChart.remove();}catch(e){} volChart=null;}
   if(rsiChart){try{rsiChart.remove();}catch(e){} rsiChart=null;}
   if(oiChart){try{oiChart.remove();}catch(e){} oiChart=null;}
-  candleSeries=null; drawnPriceLines=[]; trendPoints=[]; overlayLines=[];
-  var cv=document.getElementById('draw-canvas');
-  var ctx=cv.getContext('2d');
-  ctx.clearRect(0,0,cv.width,cv.height);
+  candleSeries=null;drawnPriceLines=[];trendPoints=[];overlayLines=[];drawingKlines=[];
 }
 
 function openChart(sym){
-  currentSym=sym; currentTf='1w';
+  currentSym=sym;currentTf='1w';
   document.getElementById('scanner-view').style.display='none';
   document.getElementById('chart-view').style.display='block';
   document.getElementById('c-sym').textContent=sym+'/USDT';
@@ -452,26 +453,25 @@ function openChart(sym){
       fEl.textContent=(row.funding>0?'+':'')+row.funding.toFixed(4)+'%';
       fEl.className='meta-val '+(row.funding>0.05?'dn':row.funding<-0.01?'up':'neu');
     }else{fEl.textContent='-';fEl.className='meta-val neu';}
-    if(row.oi){
-      document.getElementById('m-oi').textContent=fmtBig(row.oi);
-    }else{
-      document.getElementById('m-oi').textContent='Spot only';
-    }
+    document.getElementById('m-oi').textContent=row.oi?fmtBig(row.oi):'Loading...';
   }
   document.querySelectorAll('.tf-btn').forEach(function(b){
     b.className=b.getAttribute('data-tf')==='1w'?'tf-btn on':'tf-btn';
   });
   setActiveTool('cursor');
 
-  // fetch OI history + LS ratio
   Promise.all([
-    fetch('https://fapi.binance.com/futures/data/openInterestHist?symbol='+sym+'USDT&period=1h&limit=100').then(function(r){return r.json();}).catch(function(){return null;}),
-    fetch('https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol='+sym+'USDT&period=5m&limit=1').then(function(r){return r.json();}).catch(function(){return null;})
+    fetch('https://fapi.binance.com/futures/data/openInterestHist?symbol='+sym+'USDT&period=1h&limit=1')
+      .then(function(r){return r.json();}).catch(function(){return null;}),
+    fetch('https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol='+sym+'USDT&period=5m&limit=1')
+      .then(function(r){return r.json();}).catch(function(){return null;})
   ]).then(function(res){
-    var oiHist=res[0], ls=res[1];
+    var oiHist=res[0],ls=res[1];
     if(oiHist&&Array.isArray(oiHist)&&oiHist.length>0){
-      var lastOi=oiHist[oiHist.length-1];
-      document.getElementById('m-oi').textContent=fmtBig(parseFloat(lastOi.sumOpenInterestValue));
+      var v=parseFloat(oiHist[oiHist.length-1].sumOpenInterestValue);
+      document.getElementById('m-oi').textContent=v>0?fmtBig(v):'Spot only';
+    }else{
+      document.getElementById('m-oi').textContent='Spot only';
     }
     if(ls&&Array.isArray(ls)&&ls[0]){
       var lPct=parseFloat(ls[0].longAccount)*100;
@@ -487,15 +487,15 @@ function openChart(sym){
 }
 
 function limitForTf(tf){
-  var limits={'1h':500,'4h':500,'1d':500,'1w':500,'1M':200,'3d':500};
-  return limits[tf]||300;
+  var m={'1h':1000,'4h':1000,'1d':1000,'1w':500,'1M':200,'3d':500};
+  return m[tf]||500;
 }
 
 function loadChart(sym,tf){
   currentTf=tf;
   destroyCharts();
   var loadEl=document.getElementById('chart-loading');
-  loadEl.style.display='block'; loadEl.textContent='Loading chart...';
+  loadEl.style.display='block';loadEl.textContent='Loading chart...';
   document.getElementById('vol-chart-container').style.display='none';
   document.getElementById('oi-chart-container').style.display='none';
   document.getElementById('rsi-chart-container').style.display='none';
@@ -504,9 +504,12 @@ function loadChart(sym,tf){
   var oiPeriod={'1h':'1h','4h':'4h','1d':'1d','1w':'1d','1M':'1d','3d':'4h'}[tf]||'1h';
 
   Promise.all([
-    fetch('https://api.binance.com/api/v3/klines?symbol='+sym+'USDT&interval='+tf+'&limit='+limit).then(function(r){return r.json();}),
-    fetch('https://fapi.binance.com/futures/data/openInterestHist?symbol='+sym+'USDT&period='+oiPeriod+'&limit=200').then(function(r){return r.json();}).catch(function(){return null;})
+    fetch('https://api.binance.com/api/v3/klines?symbol='+sym+'USDT&interval='+tf+'&limit='+limit)
+      .then(function(r){return r.json();}),
+    fetch('https://fapi.binance.com/futures/data/openInterestHist?symbol='+sym+'USDT&period='+oiPeriod+'&limit=500')
+      .then(function(r){return r.json();}).catch(function(){return null;})
   ]).then(function(res){
+    drawingKlines=res[0];
     loadEl.style.display='none';
     document.getElementById('vol-chart-container').style.display='block';
     document.getElementById('rsi-chart-container').style.display='block';
@@ -514,7 +517,7 @@ function loadChart(sym,tf){
     if(oiData&&Array.isArray(oiData)&&oiData.length>0){
       document.getElementById('oi-chart-container').style.display='block';
     }
-    buildCharts(res[0],oiData);
+    buildCharts(drawingKlines,oiData);
   }).catch(function(e){loadEl.textContent='Error: '+e.message;});
 }
 
@@ -547,9 +550,10 @@ function buildCharts(klines,oiData){
     borderUpColor:'#00f5a0',borderDownColor:'#ff4d6a',
     wickUpColor:'#00f5a0',wickDownColor:'#ff4d6a'
   });
-  candleSeries.setData(klines.map(function(k){
+  var cData=klines.map(function(k){
     return{time:Math.floor(k[0]/1000),open:parseFloat(k[1]),high:parseFloat(k[2]),low:parseFloat(k[3]),close:parseFloat(k[4])};
-  }));
+  });
+  candleSeries.setData(cData);
 
   function addLine(data,color,lw){
     var s=mainChart.addLineSeries({color:color,lineWidth:lw,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});
@@ -563,6 +567,35 @@ function buildCharts(klines,oiData){
   addLine(ma50,'#ff8800',1.5);
   addLine(ma7,'#ff4444',1.5);
 
+  /* KEY: use subscribeClick for drawing - this is the correct LW Charts way */
+  mainChart.subscribeClick(function(param){
+    if(activeTool==='cursor') return;
+    if(!param.point) return;
+    var x=param.point.x, y=param.point.y;
+    var price=param.seriesData&&param.seriesData.size>0?null:mainChart.priceScale('right').coordinateToPrice(y);
+    price=mainChart.priceScale('right').coordinateToPrice(y);
+    if(price===null||price===undefined) return;
+
+    if(activeTool==='hline'){
+      /* draw on canvas overlay */
+      drawHLine(y,price);
+      try{
+        var pl=candleSeries.createPriceLine({price:price,color:'rgba(0,200,255,0.6)',lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,axisLabelVisible:true,title:fmtPrice(price)});
+        drawnPriceLines.push(pl);
+      }catch(e2){}
+    }else if(activeTool==='tline'){
+      trendPoints.push({x:x,y:y,price:price});
+      if(trendPoints.length===2){
+        drawTLine(trendPoints[0],trendPoints[1]);
+        trendPoints=[];
+        document.getElementById('tool-hint').textContent='Done - click again for another line';
+      }else{
+        document.getElementById('tool-hint').textContent='Click second point...';
+        redrawOverlay();
+      }
+    }
+  });
+
   volChart=LightweightCharts.createChart(document.getElementById('vol-chart-container'),Object.assign({},base,{width:W,height:90,timeScale:{visible:false,borderColor:'#222230'}}));
   var volS=volChart.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:''});
   volChart.priceScale('').applyOptions({scaleMargins:{top:0.1,bottom:0}});
@@ -572,128 +605,105 @@ function buildCharts(klines,oiData){
 
   if(oiData&&Array.isArray(oiData)&&oiData.length>0){
     oiChart=LightweightCharts.createChart(document.getElementById('oi-chart-container'),Object.assign({},base,{width:W,height:90,timeScale:{visible:false,borderColor:'#222230'}}));
-    var oiS=oiChart.addAreaSeries({lineColor:'#00c8ff',topColor:'rgba(0,200,255,0.2)',bottomColor:'rgba(0,200,255,0.01)',lineWidth:1.5,priceLineVisible:false,lastValueVisible:true});
+    var oiS=oiChart.addAreaSeries({lineColor:'#ffa500',topColor:'rgba(255,165,0,0.2)',bottomColor:'rgba(255,165,0,0.01)',lineWidth:1.5,priceLineVisible:false,lastValueVisible:true});
     oiS.setData(oiData.map(function(o){
-      return{time:Math.floor(o.timestamp/1000),value:parseFloat(o.sumOpenInterestValue)};
-    }));
+      return{time:Math.floor(parseInt(o.timestamp)/1000),value:parseFloat(o.sumOpenInterestValue)};
+    }).filter(function(d){return d.value>0;}));
   }
 
   rsiChart=LightweightCharts.createChart(document.getElementById('rsi-chart-container'),Object.assign({},base,{width:W,height:110,timeScale:{visible:false,borderColor:'#222230'}}));
   var rsiS=rsiChart.addLineSeries({lineWidth:1.5,priceLineVisible:false,lastValueVisible:true,color:'#00c8ff'});
   rsiS.setData(klines.map(function(k,i){return rsiArr[i]!==null?{time:Math.floor(k[0]/1000),value:rsiArr[i]}:null;}).filter(Boolean));
-  function addRL(v,c){var s=rsiChart.addLineSeries({color:c,lineWidth:1,priceLineVisible:false,lastValueVisible:false});s.setData(klines.map(function(k){return{time:Math.floor(k[0]/1000),value:v};}));}
+  function addRL(v,c){
+    var s=rsiChart.addLineSeries({color:c,lineWidth:1,priceLineVisible:false,lastValueVisible:false});
+    s.setData(klines.map(function(k){return{time:Math.floor(k[0]/1000),value:v};}));
+  }
   addRL(70,'rgba(255,77,106,0.35)');addRL(50,'rgba(255,255,255,0.1)');addRL(30,'rgba(0,245,160,0.35)');
 
   mainChart.timeScale().subscribeVisibleLogicalRangeChange(function(r){
     if(!r) return;
-    if(volChart) volChart.timeScale().setVisibleLogicalRange(r);
-    if(rsiChart) rsiChart.timeScale().setVisibleLogicalRange(r);
-    if(oiChart) oiChart.timeScale().setVisibleLogicalRange(r);
+    if(volChart) try{volChart.timeScale().setVisibleLogicalRange(r);}catch(e){}
+    if(rsiChart) try{rsiChart.timeScale().setVisibleLogicalRange(r);}catch(e){}
+    if(oiChart) try{oiChart.timeScale().setVisibleLogicalRange(r);}catch(e){}
   });
+}
 
-  var cv=document.getElementById('draw-canvas');
-  cv.width=W; cv.height=H;
-  overlayLines=[];
+/* DRAWING - canvas overlay on top of chart */
+function getOrCreateOverlay(){
+  var existing=document.getElementById('draw-canvas-overlay');
+  if(existing) return existing;
+  var cv=document.createElement('canvas');
+  cv.id='draw-canvas-overlay';
+  cv.style.position='absolute';
+  cv.style.top='0';cv.style.left='0';
+  cv.style.pointerEvents='none';
+  cv.style.zIndex='30';
+  var outer=document.getElementById('chart-outer');
+  var mainEl=document.getElementById('main-chart-container');
+  cv.width=mainEl.clientWidth||800;
+  cv.height=440;
+  outer.appendChild(cv);
+  return cv;
+}
+
+function redrawOverlay(){
+  var cv=getOrCreateOverlay();
+  var ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,cv.width,cv.height);
+  overlayLines.forEach(function(line){
+    ctx.beginPath();
+    ctx.strokeStyle=line.color;
+    ctx.lineWidth=1.5;
+    if(line.dash) ctx.setLineDash(line.dash);else ctx.setLineDash([]);
+    ctx.moveTo(line.x1,line.y1);ctx.lineTo(line.x2,line.y2);
+    ctx.stroke();ctx.setLineDash([]);
+    if(line.label){
+      ctx.fillStyle=line.color;ctx.font='11px monospace';
+      ctx.fillText(line.label,cv.width-110,line.y1-5);
+    }
+  });
+  if(activeTool==='tline'&&trendPoints.length===1){
+    var cv2=getOrCreateOverlay();
+    ctx.beginPath();ctx.strokeStyle='rgba(255,215,0,0.8)';ctx.lineWidth=1.5;
+    ctx.arc(trendPoints[0].x,trendPoints[0].y,5,0,Math.PI*2);ctx.stroke();
+  }
+}
+
+function drawHLine(y,price){
+  var cv=getOrCreateOverlay();
+  overlayLines.push({x1:0,y1:y,x2:cv.width,y2:y,color:'#00c8ff',dash:[5,3],label:fmtPrice(price)});
   redrawOverlay();
 }
 
-/* DRAWING */
+function drawTLine(p1,p2){
+  var cv=getOrCreateOverlay();
+  var dx=p2.x-p1.x,dy=p2.y-p1.y;
+  var x1e=0,x2e=cv.width,y1e,y2e;
+  if(Math.abs(dx)>0.1){
+    var slope=dy/dx;
+    y1e=p1.y+slope*(x1e-p1.x);
+    y2e=p1.y+slope*(x2e-p1.x);
+  }else{x1e=p1.x;x2e=p1.x;y1e=0;y2e=cv.height;}
+  overlayLines.push({x1:x1e,y1:y1e,x2:x2e,y2:y2e,color:'#ffd700'});
+  redrawOverlay();
+}
+
 function setActiveTool(tool){
   activeTool=tool;
   ['cursor','hline','tline'].forEach(function(t){
     document.getElementById('tool-'+t).className=t===tool?'tool-btn on':'tool-btn';
   });
-  var hints={cursor:'Cursor mode',hline:'Click chart to draw H-Line',tline:'Click first point...'};
+  var hints={cursor:'Cursor mode',hline:'Click on chart to draw horizontal line',tline:'Click first point on chart...'};
   document.getElementById('tool-hint').textContent=hints[tool]||'';
-  var cv=document.getElementById('draw-canvas');
-  if(tool==='cursor'){
-    cv.style.pointerEvents='none'; cv.style.cursor='default'; trendPoints=[];
-  }else{
-    cv.style.pointerEvents='all'; cv.style.cursor='crosshair';
-  }
+  if(tool==='cursor') trendPoints=[];
 }
-
-function redrawOverlay(){
-  var cv=document.getElementById('draw-canvas');
-  if(!cv) return;
-  var ctx=cv.getContext('2d');
-  ctx.clearRect(0,0,cv.width,cv.height);
-  overlayLines.forEach(function(line){
-    ctx.beginPath();
-    ctx.strokeStyle=line.color||'#00c8ff';
-    ctx.lineWidth=1.5;
-    if(line.dash) ctx.setLineDash(line.dash); else ctx.setLineDash([]);
-    if(line.type==='h'){
-      ctx.moveTo(0,line.y); ctx.lineTo(cv.width,line.y); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle=line.color||'#00c8ff';
-      ctx.font='11px monospace';
-      ctx.fillText(line.label||'',cv.width-100,line.y-5);
-    }else if(line.type==='t'){
-      ctx.moveTo(line.x1,line.y1); ctx.lineTo(line.x2,line.y2); ctx.stroke();
-      ctx.setLineDash([]);
-    }
-  });
-  if(activeTool==='tline'&&trendPoints.length===1){
-    ctx.beginPath();ctx.strokeStyle='rgba(255,215,0,0.7)';ctx.lineWidth=1.5;
-    ctx.arc(trendPoints[0].x,trendPoints[0].y,5,0,Math.PI*2);ctx.stroke();
-  }
-}
-
-document.getElementById('draw-canvas').addEventListener('click',function(e){
-  if(!mainChart||activeTool==='cursor') return;
-  var cv=document.getElementById('draw-canvas');
-  var rect=cv.getBoundingClientRect();
-  var x=e.clientX-rect.left;
-  var y=e.clientY-rect.top;
-
-  if(activeTool==='hline'){
-    var price=mainChart.priceScale('right').coordinateToPrice(y);
-    if(price!==null&&price!==undefined){
-      overlayLines.push({type:'h',y:y,color:'#00c8ff',dash:[5,3],label:fmtPrice(price)});
-      try{
-        var pl=candleSeries.createPriceLine({price:price,color:'rgba(0,200,255,0.5)',lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,axisLabelVisible:true});
-        drawnPriceLines.push(pl);
-      }catch(e2){}
-      redrawOverlay();
-    }
-  }else if(activeTool==='tline'){
-    var price=mainChart.priceScale('right').coordinateToPrice(y);
-    var time=mainChart.timeScale().coordinateToTime(x);
-    if(price!==null&&price!==undefined){
-      trendPoints.push({x:x,y:y});
-      if(trendPoints.length===2){
-        var p1=trendPoints[0],p2=trendPoints[1];
-        var dx=p2.x-p1.x, dy=p2.y-p1.y;
-        var x1e=0, x2e=cv.width, y1e, y2e;
-        if(Math.abs(dx)>0.1){
-          var slope=dy/dx;
-          y1e=p1.y+slope*(x1e-p1.x);
-          y2e=p1.y+slope*(x2e-p1.x);
-        }else{x1e=p1.x;x2e=p1.x;y1e=0;y2e=cv.height;}
-        overlayLines.push({type:'t',x1:x1e,y1:y1e,x2:x2e,y2:y2e,color:'#ffd700'});
-        trendPoints=[];
-        document.getElementById('tool-hint').textContent='Done - click again for another';
-        redrawOverlay();
-      }else{
-        document.getElementById('tool-hint').textContent='Click second point...';
-        redrawOverlay();
-      }
-    }
-  }
-});
 
 /* NEWS */
 function loadNews(sym){
   document.getElementById('news-title').textContent=sym+' News - Loading...';
   document.getElementById('news-list').innerHTML='';
   var symLower=sym.toLowerCase();
-  var aliases={
-    'btc':['bitcoin','btc'],'eth':['ethereum','eth'],'sol':['solana','sol'],
-    'bnb':['binance','bnb'],'xrp':['ripple','xrp'],'ada':['cardano','ada'],
-    'doge':['dogecoin','doge'],'avax':['avalanche','avax'],'dot':['polkadot','dot'],
-    'matic':['polygon','matic'],'link':['chainlink','link'],'uni':['uniswap','uni']
-  };
+  var aliases={'btc':['bitcoin','btc'],'eth':['ethereum','eth'],'sol':['solana','sol'],'bnb':['binance','bnb'],'xrp':['ripple','xrp'],'ada':['cardano','ada'],'doge':['dogecoin','doge'],'avax':['avalanche','avax'],'dot':['polkadot','dot'],'matic':['polygon','matic'],'link':['chainlink','link'],'uni':['uniswap','uni']};
   var keywords=aliases[symLower]||[symLower];
   var R2J='https://api.rss2json.com/v1/api.json?rss_url=';
   var feeds=[
@@ -748,6 +758,8 @@ document.getElementById('btn-refresh').addEventListener('click',function(){load(
 document.getElementById('sortsel').addEventListener('change',function(){render();});
 document.getElementById('back-btn').addEventListener('click',function(){
   destroyCharts();
+  var cv=document.getElementById('draw-canvas-overlay');
+  if(cv) cv.remove();
   document.getElementById('chart-view').style.display='none';
   document.getElementById('scanner-view').style.display='block';
 });
@@ -755,11 +767,12 @@ document.getElementById('tool-cursor').addEventListener('click',function(){setAc
 document.getElementById('tool-hline').addEventListener('click',function(){setActiveTool('hline');});
 document.getElementById('tool-tline').addEventListener('click',function(){setActiveTool('tline');});
 document.getElementById('tool-clear').addEventListener('click',function(){
-  overlayLines=[];
+  overlayLines=[];trendPoints=[];
   drawnPriceLines.forEach(function(pl){try{candleSeries.removePriceLine(pl);}catch(e){}});
-  drawnPriceLines=[]; trendPoints=[];
+  drawnPriceLines=[];
   redrawOverlay();
-  document.getElementById('tool-hint').textContent=activeTool==='cursor'?'Cursor mode':activeTool==='hline'?'Click chart to draw H-Line':'Click first point...';
+  var hints={cursor:'Cursor mode',hline:'Click on chart to draw horizontal line',tline:'Click first point on chart...'};
+  document.getElementById('tool-hint').textContent=hints[activeTool]||'';
 });
 document.querySelectorAll('th[data-key]').forEach(function(th){
   th.addEventListener('click',function(){sortBy(th.getAttribute('data-key'));});
@@ -774,10 +787,12 @@ document.querySelectorAll('.tf-btn').forEach(function(btn){
 });
 window.addEventListener('resize',function(){
   var w=document.getElementById('main-chart-container').clientWidth;
-  if(mainChart){mainChart.applyOptions({width:w});var cv=document.getElementById('draw-canvas');cv.width=w;redrawOverlay();}
+  if(mainChart) mainChart.applyOptions({width:w});
   if(volChart) volChart.applyOptions({width:document.getElementById('vol-chart-container').clientWidth});
   if(rsiChart) rsiChart.applyOptions({width:document.getElementById('rsi-chart-container').clientWidth});
   if(oiChart) oiChart.applyOptions({width:document.getElementById('oi-chart-container').clientWidth});
+  var cv=document.getElementById('draw-canvas-overlay');
+  if(cv){cv.width=w;redrawOverlay();}
 });
 
 load();
