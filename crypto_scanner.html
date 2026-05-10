@@ -365,11 +365,12 @@ function render(){
     var cc=d.chg>=0?'up':'dn',sign=d.chg>=0?'+':'';
     var hlPill=d.hl===2?'<span class="pill pg">HH-HL</span>':d.hl===1?'<span class="pill py">Partial</span>':'<span class="pill pr">None</span>';
     var trPill=d.trend===2?'<span class="pill pg">Bull</span>':d.trend===1?'<span class="pill py">Neutral</span>':'<span class="pill pr">Bear</span>';
-    var sigs=(d.strong?'<span class="tag tag-hot">Strong</span>':'')+(d.vSpike?'<span class="tag">VolUp</span>':'')+(d.isFutures?'<span class="tag tag-fut">Futures</span>':'');
+    var sigs=(d.strong?'<span class="tag tag-hot">Strong</span>':'')+(d.vSpike?'<span class="tag">VolUp</span>':'');
+    var futTag=d.isFutures?'<span class="tag tag-fut">F</span>':'';
     var fcc=d.funding===null?'neu':d.funding>0.05?'dn':d.funding<-0.01?'up':'neu';
     var fStr=d.funding===null?'-':(d.funding>0?'+':'')+d.funding.toFixed(4)+'%';
     html+='<tr>';
-    html+='<td><span class="sym-link" data-sym="'+d.sym+'">'+d.sym+'</span></td>';
+    html+='<td><span class="sym-link" data-sym="'+d.sym+'">'+d.sym+'</span>'+futTag+'</td>';
     html+='<td class="neu">'+fmtPrice(d.price)+'</td>';
     html+='<td class="'+cc+'">'+sign+d.chg.toFixed(2)+'%</td>';
     html+='<td class="neu">'+(d.cap?fmtBig(d.cap):'-')+'</td>';
@@ -463,16 +464,24 @@ function openChart(sym){
   Promise.all([
     fetch('https://fapi.binance.com/futures/data/openInterestHist?symbol='+sym+'USDT&period=1h&limit=1')
       .then(function(r){return r.json();}).catch(function(){return null;}),
+    fetch('https://fapi.binance.com/fapi/v1/openInterest?symbol='+sym+'USDT')
+      .then(function(r){return r.json();}).catch(function(){return null;}),
     fetch('https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol='+sym+'USDT&period=5m&limit=1')
       .then(function(r){return r.json();}).catch(function(){return null;})
   ]).then(function(res){
-    var oiHist=res[0],ls=res[1];
+    var oiHist=res[0],oiNow=res[1],ls=res[2];
+    var oiSet=false;
     if(oiHist&&Array.isArray(oiHist)&&oiHist.length>0){
       var v=parseFloat(oiHist[oiHist.length-1].sumOpenInterestValue);
-      document.getElementById('m-oi').textContent=v>0?fmtBig(v):'Spot only';
-    }else{
-      document.getElementById('m-oi').textContent='Spot only';
+      if(v>0){document.getElementById('m-oi').textContent=fmtBig(v);oiSet=true;}
     }
+    if(!oiSet&&oiNow&&oiNow.openInterest){
+      var row2=null;
+      for(var i=0;i<rows.length;i++){if(rows[i].sym===sym){row2=rows[i];break;}}
+      var v2=parseFloat(oiNow.openInterest)*(row2?row2.price:0);
+      if(v2>0){document.getElementById('m-oi').textContent=fmtBig(v2);oiSet=true;}
+    }
+    if(!oiSet) document.getElementById('m-oi').textContent='Spot only';
     if(ls&&Array.isArray(ls)&&ls[0]){
       var lPct=parseFloat(ls[0].longAccount)*100;
       var sPct=parseFloat(ls[0].shortAccount)*100;
@@ -514,8 +523,10 @@ function loadChart(sym,tf){
     document.getElementById('vol-chart-container').style.display='block';
     document.getElementById('rsi-chart-container').style.display='block';
     var oiData=res[1];
-    if(oiData&&Array.isArray(oiData)&&oiData.length>0){
+    if(oiData&&Array.isArray(oiData)&&oiData.length>0&&parseFloat(oiData[0].sumOpenInterestValue)>0){
       document.getElementById('oi-chart-container').style.display='block';
+    }else{
+      document.getElementById('oi-chart-container').style.display='none';
     }
     buildCharts(drawingKlines,oiData);
   }).catch(function(e){loadEl.textContent='Error: '+e.message;});
@@ -567,18 +578,19 @@ function buildCharts(klines,oiData){
   addLine(ma50,'#ff8800',1.5);
   addLine(ma7,'#ff4444',1.5);
 
-  /* KEY: use subscribeClick for drawing - this is the correct LW Charts way */
+  /* Drawing via subscribeClick */
   mainChart.subscribeClick(function(param){
     if(activeTool==='cursor') return;
     if(!param.point) return;
-    var x=param.point.x, y=param.point.y;
-    var price=param.seriesData&&param.seriesData.size>0?null:mainChart.priceScale('right').coordinateToPrice(y);
-    price=mainChart.priceScale('right').coordinateToPrice(y);
+    var x=param.point.x;
+    var y=param.point.y;
+    var price=mainChart.priceScale('right').coordinateToPrice(y);
     if(price===null||price===undefined) return;
 
     if(activeTool==='hline'){
-      /* draw on canvas overlay */
-      drawHLine(y,price);
+      var cv=getOrCreateOverlay();
+      overlayLines.push({x1:0,y1:y,x2:cv.width,y2:y,color:'#00c8ff',dash:[5,3],label:fmtPrice(price)});
+      redrawOverlay();
       try{
         var pl=candleSeries.createPriceLine({price:price,color:'rgba(0,200,255,0.6)',lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,axisLabelVisible:true,title:fmtPrice(price)});
         drawnPriceLines.push(pl);
