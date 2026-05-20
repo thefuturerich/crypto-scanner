@@ -134,6 +134,24 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .news-head a:hover{text-decoration:underline;}
 .news-meta{font-size:10px;color:#6b6b80;}
 .news-bull{color:#00f5a0;} .news-bear{color:#ff4d6a;} .news-neu{color:#6b6b80;}
+
+/* ── FUTURES PANEL ── */
+.futures-panel{background:#111118;border:1px solid #222230;border-radius:10px;padding:14px 16px;margin-bottom:8px;}
+.fp-title{font-size:11px;color:#6b6b80;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-weight:bold;}
+.fp-spot-note{font-size:10px;color:#ffa500;margin-left:8px;text-transform:none;letter-spacing:0;}
+.fp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+.fp-card{background:#1a1a24;border:1px solid #222230;border-radius:8px;padding:12px 14px;}
+.fp-card-wide{grid-column:span 2;}
+.fp-card-title{font-size:10px;color:#6b6b80;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.fp-card-main{font-size:18px;font-weight:bold;color:#e8e8f0;margin-bottom:3px;}
+.fp-card-sub{font-size:10px;color:#6b6b80;}
+.fp-ls-bar-wrap{height:6px;background:#2a2a3a;border-radius:3px;margin-bottom:8px;overflow:hidden;}
+.fp-ls-bar-inner{height:100%;background:rgba(0,245,160,0.5);border-radius:3px;transition:width 0.4s;}
+.fp-liq-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.fp-liq-label{font-size:10px;color:#6b6b80;margin-bottom:4px;}
+.fp-liq-val{font-size:16px;font-weight:bold;}
+.fp-liq-divider{width:1px;height:36px;background:#2a2a3a;}
+.fp-spot-only{background:rgba(255,165,0,0.06);border:1px solid rgba(255,165,0,0.25);border-radius:8px;padding:10px 14px;font-size:12px;color:#ffa500;margin-bottom:8px;}
 </style>
 </head>
 <body>
@@ -187,7 +205,6 @@ tr:hover td{background:rgba(255,255,255,0.02);}
           <th data-key="cap">MarketCap</th>
           <th data-key="vol">24h Vol</th>
           <th data-key="funding">Funding</th>
-          <th data-key="oi">OI (USD)</th>
           <th data-key="hl">HH-HL</th>
           <th data-key="trend">Trend</th>
           <th>Signal</th>
@@ -225,8 +242,71 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     <div class="meta-item"><div class="meta-label">MarketCap</div><div class="meta-val" id="m-cap">-</div></div>
     <div class="meta-item"><div class="meta-label">24h Volume</div><div class="meta-val" id="m-vol">-</div></div>
     <div class="meta-item"><div class="meta-label">Funding Rate</div><div class="meta-val" id="m-funding">-</div></div>
-    <div class="meta-item"><div class="meta-label">Open Interest</div><div class="meta-val" id="m-oi">-</div></div>
-    <div class="meta-item"><div class="meta-label">Long/Short</div><div class="meta-val" id="m-ls">-</div></div>
+    <div class="meta-item"><div class="meta-label">Mark Price</div><div class="meta-val" id="m-mark">-</div></div>
+  </div>
+
+  <!-- ── FUTURES DATA PANEL ── -->
+  <div class="futures-panel" id="futures-panel" style="display:none">
+    <div class="fp-title">📊 선물 데이터 <span class="fp-spot-note" id="fp-spot-note"></span></div>
+    <div class="fp-grid">
+      <!-- OI -->
+      <div class="fp-card">
+        <div class="fp-card-title">미체결 약정 (OI)</div>
+        <div class="fp-card-main" id="fp-oi">-</div>
+        <div class="fp-card-sub" id="fp-oi-chg">-</div>
+      </div>
+      <!-- 롱/숏 - 글로벌 -->
+      <div class="fp-card">
+        <div class="fp-card-title">롱/숏 비율 (전체)</div>
+        <div class="fp-ls-bar-wrap">
+          <div class="fp-ls-bar-inner" id="fp-ls-bar" style="width:50%"></div>
+        </div>
+        <div class="fp-card-main" id="fp-ls">-</div>
+        <div class="fp-card-sub" id="fp-ls-sub">Global Account Ratio</div>
+      </div>
+      <!-- 롱/숏 - 상위트레이더 -->
+      <div class="fp-card">
+        <div class="fp-card-title">롱/숏 비율 (탑트레이더)</div>
+        <div class="fp-ls-bar-wrap">
+          <div class="fp-ls-bar-inner" id="fp-top-ls-bar" style="width:50%"></div>
+        </div>
+        <div class="fp-card-main" id="fp-top-ls">-</div>
+        <div class="fp-card-sub">Top Trader Account Ratio</div>
+      </div>
+      <!-- 테이커 비율 -->
+      <div class="fp-card">
+        <div class="fp-card-title">테이커 매수/매도</div>
+        <div class="fp-ls-bar-wrap">
+          <div class="fp-ls-bar-inner" id="fp-taker-bar" style="width:50%;background:rgba(0,200,255,0.5)"></div>
+        </div>
+        <div class="fp-card-main" id="fp-taker">-</div>
+        <div class="fp-card-sub">Taker Buy/Sell Volume</div>
+      </div>
+      <!-- 청산 -->
+      <div class="fp-card fp-card-wide">
+        <div class="fp-card-title">최근 24h 청산</div>
+        <div class="fp-liq-row">
+          <div>
+            <div class="fp-liq-label up">롱 청산</div>
+            <div class="fp-liq-val dn" id="fp-liq-long">-</div>
+          </div>
+          <div class="fp-liq-divider"></div>
+          <div>
+            <div class="fp-liq-label dn">숏 청산</div>
+            <div class="fp-liq-val up" id="fp-liq-short">-</div>
+          </div>
+          <div class="fp-liq-divider"></div>
+          <div>
+            <div class="fp-liq-label neu">총 청산</div>
+            <div class="fp-liq-val neu" id="fp-liq-total">-</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- spot-only notice -->
+  <div class="fp-spot-only" id="fp-spot-only" style="display:none">
+    <span>⚠️ 이 코인은 선물 시장 데이터가 없습니다 (현물 전용)</span>
   </div>
   <div class="tool-row">
     <button class="tool-btn on" id="tool-cursor">Cursor</button>
@@ -321,7 +401,7 @@ function load(){
   var minVolM=parseFloat(document.getElementById('minvol').value)*1e6;
   var st=document.getElementById('st');
   st.className='status loading';st.textContent='Connecting...';
-  document.getElementById('tb').innerHTML='<tr><td colspan="10" class="empty">Loading...</td></tr>';
+  document.getElementById('tb').innerHTML='<tr><td colspan="9" class="empty">Loading...</td></tr>';
   setProgress(5);
 
   Promise.all([
@@ -427,7 +507,7 @@ function load(){
   }).catch(function(e){
     document.getElementById('st').className='status err';
     document.getElementById('st').textContent='Error: '+e.message;
-    document.getElementById('tb').innerHTML='<tr><td colspan="10" class="empty">Failed</td></tr>';
+    document.getElementById('tb').innerHTML='<tr><td colspan="9" class="empty">Failed</td></tr>';
     setProgress(0);
   });
 }
@@ -444,7 +524,7 @@ function render(){
     return sDir*(av-bv);
   });
   var tb=document.getElementById('tb');
-  if(!data.length){tb.innerHTML='<tr><td colspan="10" class="empty">No results</td></tr>';return;}
+  if(!data.length){tb.innerHTML='<tr><td colspan="9" class="empty">No results</td></tr>';return;}
   var html='';
   data.slice(0,80).forEach(function(d){
     var cc=d.chg>=0?'up':'dn',sign=d.chg>=0?'+':'';
@@ -461,7 +541,6 @@ function render(){
     html+='<td class="neu">'+(d.cap?fmtBig(d.cap):'-')+'</td>';
     html+='<td class="neu">'+fmtBig(d.vol)+'</td>';
     html+='<td class="'+fcc+'">'+fStr+'</td>';
-    html+='<td class="neu">'+(d.oi?fmtBig(d.oi):'-')+'</td>';
     html+='<td>'+hlPill+'</td>';
     html+='<td>'+trPill+'</td>';
     html+='<td>'+(sigs||'<span class="neu">-</span>')+'</td>';
@@ -703,6 +782,9 @@ function openChart(sym){
   document.getElementById('scanner-view').style.display='none';
   document.getElementById('chart-view').style.display='block';
   document.getElementById('c-sym').textContent=sym+'/USDT';
+  document.getElementById('futures-panel').style.display='none';
+  document.getElementById('fp-spot-only').style.display='none';
+
   var row=null;
   for(var i=0;i<rows.length;i++){if(rows[i].sym===sym){row=rows[i];break;}}
   if(row){
@@ -717,45 +799,169 @@ function openChart(sym){
       fEl.textContent=(row.funding>0?'+':'')+row.funding.toFixed(4)+'%';
       fEl.className='meta-val '+(row.funding>0.05?'dn':row.funding<-0.01?'up':'neu');
     }else{fEl.textContent='-';fEl.className='meta-val neu';}
-    document.getElementById('m-oi').textContent=row.oi?fmtBig(row.oi):'Loading...';
   }
   document.querySelectorAll('.tf-btn').forEach(function(b){
     b.className=b.getAttribute('data-tf')==='1w'?'tf-btn on':'tf-btn';
   });
   setActiveTool('cursor');
 
-  Promise.all([
-    fetch('https://fapi.binance.com/futures/data/openInterestHist?symbol='+sym+'USDT&period=1h&limit=1')
-      .then(function(r){return r.json();}).catch(function(){return null;}),
-    fetch('https://fapi.binance.com/fapi/v1/openInterest?symbol='+sym+'USDT')
-      .then(function(r){return r.json();}).catch(function(){return null;}),
-    fetch('https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol='+sym+'USDT&period=5m&limit=1')
-      .then(function(r){return r.json();}).catch(function(){return null;})
-  ]).then(function(res){
-    var oiHist=res[0],oiNow=res[1],ls=res[2];
-    var oiSet=false;
-    if(oiHist&&Array.isArray(oiHist)&&oiHist.length>0){
-      var v=parseFloat(oiHist[oiHist.length-1].sumOpenInterestValue);
-      if(v>0){document.getElementById('m-oi').textContent=fmtBig(v);oiSet=true;}
-    }
-    if(!oiSet&&oiNow&&oiNow.openInterest){
-      var row2=null;
-      for(var i=0;i<rows.length;i++){if(rows[i].sym===sym){row2=rows[i];break;}}
-      var v2=parseFloat(oiNow.openInterest)*(row2?row2.price:0);
-      if(v2>0){document.getElementById('m-oi').textContent=fmtBig(v2);oiSet=true;}
-    }
-    if(!oiSet) document.getElementById('m-oi').textContent='Spot only';
-    if(ls&&Array.isArray(ls)&&ls[0]){
-      var lPct=parseFloat(ls[0].longAccount)*100;
-      var sPct=parseFloat(ls[0].shortAccount)*100;
-      var lsEl=document.getElementById('m-ls');
-      lsEl.textContent='L '+lPct.toFixed(1)+'% / S '+sPct.toFixed(1)+'%';
-      lsEl.className='meta-val '+(lPct>60?'up':lPct<40?'dn':'neu');
-    }
-  });
+  // mark price
+  fetch('https://fapi.binance.com/fapi/v1/premiumIndex?symbol='+sym+'USDT')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d&&d.markPrice){
+        document.getElementById('m-mark').textContent=fmtPrice(parseFloat(d.markPrice));
+      }
+    }).catch(function(){document.getElementById('m-mark').textContent='-';});
 
+  loadFuturesData(sym);
   loadChart(sym,'1w');
   loadNews(sym);
+}
+
+/* ═══════════════════════════════════════
+   FUTURES DATA PANEL
+═══════════════════════════════════════ */
+function loadFuturesData(sym){
+  var panel=document.getElementById('futures-panel');
+  var spotOnly=document.getElementById('fp-spot-only');
+
+  // Reset
+  ['fp-oi','fp-oi-chg','fp-ls','fp-top-ls','fp-taker','fp-liq-long','fp-liq-short','fp-liq-total']
+    .forEach(function(id){document.getElementById(id).textContent='로딩중...';});
+  document.getElementById('fp-ls-bar').style.width='50%';
+  document.getElementById('fp-top-ls-bar').style.width='50%';
+  document.getElementById('fp-taker-bar').style.width='50%';
+
+  Promise.all([
+    // 1. 현재 OI
+    fetch('https://fapi.binance.com/fapi/v1/openInterest?symbol='+sym+'USDT')
+      .then(function(r){return r.json();}).catch(function(){return null;}),
+    // 2. OI 히스토리 (1h, 최근 2개 → 변화율 계산)
+    fetch('https://fapi.binance.com/futures/data/openInterestHist?symbol='+sym+'USDT&period=1h&limit=2')
+      .then(function(r){return r.json();}).catch(function(){return null;}),
+    // 3. 글로벌 롱/숏 비율
+    fetch('https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol='+sym+'USDT&period=5m&limit=1')
+      .then(function(r){return r.json();}).catch(function(){return null;}),
+    // 4. 탑트레이더 롱/숏 비율
+    fetch('https://fapi.binance.com/futures/data/topLongShortAccountRatio?symbol='+sym+'USDT&period=5m&limit=1')
+      .then(function(r){return r.json();}).catch(function(){return null;}),
+    // 5. 테이커 매수/매도 비율
+    fetch('https://fapi.binance.com/futures/data/takerlongshortRatio?symbol='+sym+'USDT&period=5m&limit=1')
+      .then(function(r){return r.json();}).catch(function(){return null;}),
+    // 6. 최근 청산 (24h)
+    fetch('https://fapi.binance.com/fapi/v1/forceOrders?symbol='+sym+'USDT&limit=200')
+      .then(function(r){return r.json();}).catch(function(){return null;})
+  ]).then(function(res){
+    var oiNow=res[0], oiHist=res[1], ls=res[2], topLs=res[3], taker=res[4], liq=res[5];
+
+    // ── 현물 전용 체크 ──
+    var isFutures=false;
+    var currentPrice=0;
+    for(var i=0;i<rows.length;i++){if(rows[i].sym===sym){currentPrice=rows[i].price;break;}}
+
+    // OI
+    if(oiNow&&oiNow.openInterest&&parseFloat(oiNow.openInterest)>0){
+      isFutures=true;
+      var oiQty=parseFloat(oiNow.openInterest);
+      var oiUsd=oiQty*currentPrice;
+      document.getElementById('fp-oi').textContent=fmtBig(oiUsd);
+
+      // OI 변화율 from hist
+      if(oiHist&&Array.isArray(oiHist)&&oiHist.length>=2){
+        var prevOiVal=parseFloat(oiHist[0].sumOpenInterestValue);
+        var currOiVal=parseFloat(oiHist[1].sumOpenInterestValue);
+        if(prevOiVal>0){
+          var oiChgPct=((currOiVal-prevOiVal)/prevOiVal*100);
+          var oiChgEl=document.getElementById('fp-oi-chg');
+          oiChgEl.textContent=(oiChgPct>=0?'▲ +':'▼ ')+oiChgPct.toFixed(2)+'% (1h 변화)';
+          oiChgEl.style.color=oiChgPct>=0?'#00f5a0':'#ff4d6a';
+        }
+      }else{
+        document.getElementById('fp-oi-chg').textContent='변화율 데이터 없음';
+      }
+    } else {
+      document.getElementById('fp-oi').textContent='선물 없음';
+      document.getElementById('fp-oi-chg').textContent='현물 전용 코인';
+    }
+
+    // 글로벌 롱/숏
+    if(ls&&Array.isArray(ls)&&ls[0]){
+      isFutures=true;
+      var lPct=parseFloat(ls[0].longAccount)*100;
+      var sPct=100-lPct;
+      var lsEl=document.getElementById('fp-ls');
+      lsEl.textContent='롱 '+lPct.toFixed(1)+'%  /  숏 '+sPct.toFixed(1)+'%';
+      lsEl.style.color=lPct>60?'#00f5a0':lPct<40?'#ff4d6a':'#e8e8f0';
+      document.getElementById('fp-ls-bar').style.width=lPct.toFixed(1)+'%';
+      document.getElementById('fp-ls-bar').style.background=lPct>55?'rgba(0,245,160,0.55)':lPct<45?'rgba(255,77,106,0.55)':'rgba(255,209,102,0.5)';
+    } else {
+      document.getElementById('fp-ls').textContent='데이터 없음';
+    }
+
+    // 탑트레이더 롱/숏
+    if(topLs&&Array.isArray(topLs)&&topLs[0]){
+      isFutures=true;
+      var tLong=parseFloat(topLs[0].longAccount)*100;
+      var tShort=100-tLong;
+      var tEl=document.getElementById('fp-top-ls');
+      tEl.textContent='롱 '+tLong.toFixed(1)+'%  /  숏 '+tShort.toFixed(1)+'%';
+      tEl.style.color=tLong>60?'#00f5a0':tLong<40?'#ff4d6a':'#e8e8f0';
+      document.getElementById('fp-top-ls-bar').style.width=tLong.toFixed(1)+'%';
+      document.getElementById('fp-top-ls-bar').style.background=tLong>55?'rgba(0,245,160,0.55)':tLong<45?'rgba(255,77,106,0.55)':'rgba(255,209,102,0.5)';
+    } else {
+      document.getElementById('fp-top-ls').textContent='데이터 없음';
+    }
+
+    // 테이커 비율
+    if(taker&&Array.isArray(taker)&&taker[0]){
+      isFutures=true;
+      var buyRatio=parseFloat(taker[0].buySellRatio); // >1 = 매수 우세
+      var buyPct=buyRatio/(1+buyRatio)*100;
+      var sellPct=100-buyPct;
+      var tkEl=document.getElementById('fp-taker');
+      tkEl.textContent='매수 '+buyPct.toFixed(1)+'%  /  매도 '+sellPct.toFixed(1)+'%';
+      tkEl.style.color=buyPct>55?'#00f5a0':buyPct<45?'#ff4d6a':'#e8e8f0';
+      document.getElementById('fp-taker-bar').style.width=buyPct.toFixed(1)+'%';
+      document.getElementById('fp-taker-bar').style.background=buyPct>55?'rgba(0,245,160,0.5)':buyPct<45?'rgba(255,77,106,0.5)':'rgba(0,200,255,0.5)';
+    } else {
+      document.getElementById('fp-taker').textContent='데이터 없음';
+    }
+
+    // 청산 데이터
+    if(liq&&Array.isArray(liq)&&liq.length>0){
+      isFutures=true;
+      var now=Date.now();
+      var h24=24*60*60*1000;
+      var longLiq=0,shortLiq=0;
+      liq.forEach(function(o){
+        if((now-o.time)>h24) return;
+        var val=parseFloat(o.origQty)*parseFloat(o.price);
+        // SELL 청산 = 롱 포지션 청산, BUY 청산 = 숏 포지션 청산
+        if(o.side==='SELL') longLiq+=val;
+        else shortLiq+=val;
+      });
+      var total=longLiq+shortLiq;
+      document.getElementById('fp-liq-long').textContent=fmtBig(longLiq)||'$0';
+      document.getElementById('fp-liq-short').textContent=fmtBig(shortLiq)||'$0';
+      document.getElementById('fp-liq-total').textContent=fmtBig(total)||'$0';
+    } else {
+      ['fp-liq-long','fp-liq-short','fp-liq-total'].forEach(function(id){
+        document.getElementById(id).textContent='-';
+      });
+    }
+
+    if(isFutures){
+      panel.style.display='block';
+      spotOnly.style.display='none';
+    } else {
+      panel.style.display='none';
+      spotOnly.style.display='block';
+    }
+  }).catch(function(){
+    panel.style.display='none';
+    spotOnly.style.display='block';
+  });
 }
 
 function limitForTf(tf){
@@ -774,31 +980,20 @@ function loadChart(sym,tf){
   document.getElementById('ma7-signal-bar').className='ma7-signal-bar';
 
   var limit=limitForTf(tf);
-  var oiPeriod={'1h':'1h','4h':'4h','1d':'1d','1w':'1d','1M':'1d','3d':'4h'}[tf]||'1h';
 
-  Promise.all([
-    fetch('https://api.binance.com/api/v3/klines?symbol='+sym+'USDT&interval='+tf+'&limit='+limit)
-      .then(function(r){return r.json();}),
-    fetch('https://fapi.binance.com/futures/data/openInterestHist?symbol='+sym+'USDT&period='+oiPeriod+'&limit=500')
-      .then(function(r){return r.json();}).catch(function(){return null;})
-  ]).then(function(res){
-    drawingKlines=res[0];
-    loadEl.style.display='none';
-    document.getElementById('vol-chart-container').style.display='block';
-    document.getElementById('rsi-chart-container').style.display='block';
-    var oiData=res[1];
-    if(oiData&&Array.isArray(oiData)&&oiData.length>0&&parseFloat(oiData[0].sumOpenInterestValue)>0){
-      document.getElementById('oi-chart-container').style.display='block';
-    }else{
-      document.getElementById('oi-chart-container').style.display='none';
-    }
-    buildCharts(drawingKlines,oiData);
-    // Show MA7 signal bar for this TF
-    showMA7SignalBar(drawingKlines,tf);
-  }).catch(function(e){loadEl.textContent='Error: '+e.message;});
+  fetch('https://api.binance.com/api/v3/klines?symbol='+sym+'USDT&interval='+tf+'&limit='+limit)
+    .then(function(r){return r.json();})
+    .then(function(klines){
+      drawingKlines=klines;
+      loadEl.style.display='none';
+      document.getElementById('vol-chart-container').style.display='block';
+      document.getElementById('rsi-chart-container').style.display='block';
+      buildCharts(drawingKlines);
+      showMA7SignalBar(drawingKlines,tf);
+    }).catch(function(e){loadEl.textContent='Error: '+e.message;});
 }
 
-function buildCharts(klines,oiData){
+function buildCharts(klines){
   var W=document.getElementById('main-chart-container').clientWidth||window.innerWidth-40;
   var H=440;
   var closes=klines.map(function(k){return parseFloat(k[4]);});
@@ -881,14 +1076,6 @@ function buildCharts(klines,oiData){
     return{time:Math.floor(k[0]/1000),value:parseFloat(k[5]),color:parseFloat(k[4])>=parseFloat(k[1])?'rgba(0,245,160,0.5)':'rgba(255,77,106,0.5)'};
   }));
 
-  if(oiData&&Array.isArray(oiData)&&oiData.length>0){
-    oiChart=LightweightCharts.createChart(document.getElementById('oi-chart-container'),Object.assign({},base,{width:W,height:90,timeScale:{visible:false,borderColor:'#222230'}}));
-    var oiS=oiChart.addAreaSeries({lineColor:'#ffa500',topColor:'rgba(255,165,0,0.2)',bottomColor:'rgba(255,165,0,0.01)',lineWidth:1.5,priceLineVisible:false,lastValueVisible:true});
-    oiS.setData(oiData.map(function(o){
-      return{time:Math.floor(parseInt(o.timestamp)/1000),value:parseFloat(o.sumOpenInterestValue)};
-    }).filter(function(d){return d.value>0;}));
-  }
-
   rsiChart=LightweightCharts.createChart(document.getElementById('rsi-chart-container'),Object.assign({},base,{width:W,height:110,timeScale:{visible:false,borderColor:'#222230'}}));
   var rsiS=rsiChart.addLineSeries({lineWidth:1.5,priceLineVisible:false,lastValueVisible:true,color:'#00c8ff'});
   rsiS.setData(klines.map(function(k,i){return rsiArr[i]!==null?{time:Math.floor(k[0]/1000),value:rsiArr[i]}:null;}).filter(Boolean));
@@ -902,7 +1089,6 @@ function buildCharts(klines,oiData){
     if(!r) return;
     if(volChart) try{volChart.timeScale().setVisibleLogicalRange(r);}catch(e){}
     if(rsiChart) try{rsiChart.timeScale().setVisibleLogicalRange(r);}catch(e){}
-    if(oiChart) try{oiChart.timeScale().setVisibleLogicalRange(r);}catch(e){}
   });
 }
 
@@ -1068,7 +1254,6 @@ window.addEventListener('resize',function(){
   if(mainChart) mainChart.applyOptions({width:w});
   if(volChart) volChart.applyOptions({width:document.getElementById('vol-chart-container').clientWidth});
   if(rsiChart) rsiChart.applyOptions({width:document.getElementById('rsi-chart-container').clientWidth});
-  if(oiChart) oiChart.applyOptions({width:document.getElementById('oi-chart-container').clientWidth});
   var cv=document.getElementById('draw-canvas-overlay');
   if(cv){cv.width=w;redrawOverlay();}
 });
