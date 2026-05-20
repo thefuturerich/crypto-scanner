@@ -46,6 +46,35 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .tag-hot{background:rgba(255,77,106,0.1);color:#ff4d6a;border-color:rgba(255,77,106,0.3);}
 .tag-fut{background:rgba(255,165,0,0.12);color:#ffa500;border:1px solid rgba(255,165,0,0.3);}
 .empty{text-align:center;padding:40px;color:#6b6b80;}
+
+/* ── MY COINS SECTION ── */
+.mycoins-section{margin:0 20px 16px;background:#111118;border:1px solid #222230;border-radius:10px;padding:14px 16px;}
+.mycoins-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.mycoins-title{font-size:11px;color:#6b6b80;text-transform:uppercase;letter-spacing:1px;font-weight:bold;}
+.mycoins-signal-badge{font-size:10px;padding:2px 8px;border-radius:99px;background:rgba(255,165,0,0.12);color:#ffa500;border:1px solid rgba(255,165,0,0.3);display:none;}
+.mycoins-add{display:flex;gap:6px;align-items:center;margin-left:auto;}
+.mycoin-input{background:#1a1a24;border:1px solid #2a2a3a;color:#e8e8f0;font-family:monospace;font-size:12px;padding:5px 10px;border-radius:6px;outline:none;width:100px;text-transform:uppercase;}
+.mycoin-input::placeholder{color:#3a3a4a;text-transform:none;}
+.mycoin-input:focus{border-color:#00c8ff;}
+.mycoin-add-btn{font-family:monospace;font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #00c8ff;background:rgba(0,200,255,0.08);color:#00c8ff;cursor:pointer;}
+.mycoin-add-btn:hover{background:rgba(0,200,255,0.18);}
+.mycoins-list{display:flex;flex-wrap:wrap;gap:8px;}
+.mycoin-card{display:flex;align-items:center;gap:0;background:#1a1a24;border:1px solid #2a2a3a;border-radius:8px;overflow:hidden;cursor:pointer;transition:border-color 0.15s;}
+.mycoin-card:hover{border-color:#00c8ff;}
+.mycoin-card.has-signal{border-color:rgba(255,165,0,0.6);animation:pulse-border 2s ease-in-out infinite;}
+@keyframes pulse-border{0%,100%{border-color:rgba(255,165,0,0.6);}50%{border-color:rgba(255,165,0,1);}}
+.mycoin-body{padding:7px 12px;display:flex;flex-direction:column;gap:3px;}
+.mycoin-sym{font-size:13px;font-weight:bold;color:#e8e8f0;}
+.mycoin-price{font-size:11px;color:#6b6b80;}
+.mycoin-sig{font-size:9px;padding:1px 5px;border-radius:99px;margin-top:2px;display:none;}
+.mycoin-sig.touch-up{display:inline-block;background:rgba(0,245,160,0.12);color:#00f5a0;border:1px solid rgba(0,245,160,0.3);}
+.mycoin-sig.touch-dn{display:inline-block;background:rgba(255,77,106,0.1);color:#ff4d6a;border:1px solid rgba(255,77,106,0.3);}
+.mycoin-sig.touch-neu{display:inline-block;background:rgba(255,165,0,0.12);color:#ffa500;border:1px solid rgba(255,165,0,0.3);}
+.mycoin-del{padding:7px 10px;background:transparent;border:none;color:#3a3a4a;cursor:pointer;font-size:14px;transition:color 0.15s;}
+.mycoin-del:hover{color:#ff4d6a;}
+.mycoins-empty{font-size:12px;color:#3a3a4a;padding:8px 0;}
+
+/* ── CHART VIEW ── */
 #chart-view{display:none;padding:16px;}
 .chart-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
 .back-btn{font-family:monospace;font-size:13px;padding:7px 16px;border-radius:6px;border:1px solid #2a2a3a;background:transparent;color:#6b6b80;cursor:pointer;}
@@ -61,6 +90,25 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .meta-item{display:flex;flex-direction:column;gap:3px;}
 .meta-label{font-size:10px;color:#6b6b80;text-transform:uppercase;letter-spacing:1px;}
 .meta-val{font-weight:bold;color:#e8e8f0;}
+
+/* MA7 Signal Banner */
+.ma7-signal-bar{display:none;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;margin-bottom:10px;flex-wrap:wrap;}
+.ma7-signal-bar.show{display:flex;}
+.ma7-signal-bar.bull{background:rgba(0,245,160,0.08);border:1px solid rgba(0,245,160,0.3);}
+.ma7-signal-bar.bear{background:rgba(255,77,106,0.08);border:1px solid rgba(255,77,106,0.3);}
+.ma7-signal-bar.near{background:rgba(255,165,0,0.08);border:1px solid rgba(255,165,0,0.3);}
+.ma7-sig-icon{font-size:16px;}
+.ma7-sig-text{font-size:12px;font-weight:bold;}
+.ma7-sig-text.bull{color:#00f5a0;}
+.ma7-sig-text.bear{color:#ff4d6a;}
+.ma7-sig-text.near{color:#ffa500;}
+.ma7-sig-sub{font-size:11px;color:#6b6b80;margin-left:auto;}
+.ma7-tf-badges{display:flex;gap:6px;flex-wrap:wrap;}
+.ma7-tf-badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:bold;}
+.ma7-tf-badge.bull{background:rgba(0,245,160,0.12);color:#00f5a0;border:1px solid rgba(0,245,160,0.3);}
+.ma7-tf-badge.bear{background:rgba(255,77,106,0.1);color:#ff4d6a;border:1px solid rgba(255,77,106,0.3);}
+.ma7-tf-badge.near{background:rgba(255,165,0,0.12);color:#ffa500;border:1px solid rgba(255,165,0,0.3);}
+
 .tool-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
 .tool-btn{font-family:monospace;font-size:12px;padding:6px 14px;border-radius:6px;border:1px solid #2a2a3a;background:transparent;color:#6b6b80;cursor:pointer;}
 .tool-btn:hover{color:#e8e8f0;border-color:#e8e8f0;}
@@ -91,6 +139,22 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 <body>
 <div id="scanner-view">
   <div style="padding:20px 20px 0"><h1>TREND SCAN</h1><div class="sub">HH/HL Scanner - Binance Live - Click symbol for chart</div></div>
+
+  <!-- ── MY COINS ── -->
+  <div class="mycoins-section">
+    <div class="mycoins-header">
+      <span class="mycoins-title">★ My Coins</span>
+      <span class="mycoins-signal-badge" id="mycoins-signal-count"></span>
+      <div class="mycoins-add">
+        <input class="mycoin-input" id="mycoin-input" type="text" placeholder="BTC, ETH…" maxlength="12">
+        <button class="mycoin-add-btn" id="mycoin-add-btn">+ Add</button>
+      </div>
+    </div>
+    <div class="mycoins-list" id="mycoins-list">
+      <span class="mycoins-empty" id="mycoins-empty">코인을 추가하세요 (예: BTC, ETH, SOL)</span>
+    </div>
+  </div>
+
   <div style="padding:0 20px 20px">
     <div class="controls">
       <label>TF</label>
@@ -145,8 +209,18 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     <button class="tf-btn" data-tf="1h">1H</button>
     <button class="tf-btn" data-tf="4h">4H</button>
     <button class="tf-btn" data-tf="1d">1D</button>
+    <button class="tf-btn" data-tf="3d">3D</button>
     <button class="tf-btn on" data-tf="1w">1W</button>
   </div>
+
+  <!-- MA7 Signal Banner -->
+  <div class="ma7-signal-bar" id="ma7-signal-bar">
+    <span class="ma7-sig-icon" id="ma7-sig-icon"></span>
+    <span class="ma7-sig-text" id="ma7-sig-text"></span>
+    <div class="ma7-tf-badges" id="ma7-tf-badges"></div>
+    <span class="ma7-sig-sub" id="ma7-sig-sub"></span>
+  </div>
+
   <div class="chart-meta">
     <div class="meta-item"><div class="meta-label">MarketCap</div><div class="meta-val" id="m-cap">-</div></div>
     <div class="meta-item"><div class="meta-label">24h Volume</div><div class="meta-val" id="m-vol">-</div></div>
@@ -190,6 +264,14 @@ var activeTool='cursor';
 var trendPoints=[],drawnPriceLines=[],overlayLines=[];
 var capMap={},futuresSet={};
 var drawingKlines=[];
+
+// ── MY COINS STATE ──
+var myCoins=JSON.parse(localStorage.getItem('myCoins')||'[]');
+// MA7 signal cache: {sym: {tf: 'bull'|'bear'|'near'|null, price, ma7, dist}}
+var myCoinSignals={};
+// MA7 touch thresholds per TF
+var MA7_TFS=['4h','1d','3d','1w'];
+var MA7_TOUCH_PCT=0.8; // within 0.8% = near/touch
 
 function fmtPrice(n){
   if(n===null||n===undefined||isNaN(n)) return '-';
@@ -293,7 +375,10 @@ function load(){
           setProgress(100);setTimeout(function(){setProgress(0);},800);
           st.className='status';
           st.textContent=rows.length+' done - HH-HL: '+rows.filter(function(d){return d.hl===2;}).length;
-          render();return;
+          render();
+          // refresh my coins signals after scan
+          scanMyCoinsMA7();
+          return;
         }
         var batch=pool.slice(idx,idx+8);idx+=8;
         setProgress(20+Math.round((idx/pool.length)*75));
@@ -386,6 +471,184 @@ function render(){
   document.querySelectorAll('.sym-link').forEach(function(el){
     el.addEventListener('click',function(){openChart(el.getAttribute('data-sym'));});
   });
+}
+
+/* ═══════════════════════════════════════
+   MY COINS
+═══════════════════════════════════════ */
+function saveMyCoinsList(){
+  localStorage.setItem('myCoins',JSON.stringify(myCoins));
+}
+
+function addMyCoin(sym){
+  sym=sym.trim().toUpperCase().replace(/USDT$/,'');
+  if(!sym) return;
+  if(myCoins.indexOf(sym)>=0) return;
+  myCoins.push(sym);
+  saveMyCoinsList();
+  renderMyCoins();
+  // Immediately scan MA7 for new coin
+  scanOneCoinMA7(sym,function(){renderMyCoins();});
+}
+
+function removeMyCoin(sym){
+  myCoins=myCoins.filter(function(s){return s!==sym;});
+  delete myCoinSignals[sym];
+  saveMyCoinsList();
+  renderMyCoins();
+}
+
+function renderMyCoins(){
+  var list=document.getElementById('mycoins-list');
+  var empty=document.getElementById('mycoins-empty');
+  if(!myCoins.length){
+    list.innerHTML='';
+    empty.style.display='block';
+    document.getElementById('mycoins-signal-count').style.display='none';
+    return;
+  }
+  empty.style.display='none';
+
+  // count coins with any signal
+  var sigCount=myCoins.filter(function(s){
+    var sig=myCoinSignals[s];
+    if(!sig) return false;
+    return Object.values(sig).some(function(v){return v&&v.type;});
+  }).length;
+
+  var badge=document.getElementById('mycoins-signal-count');
+  if(sigCount>0){
+    badge.style.display='inline-block';
+    badge.textContent=sigCount+' MA7 Signal'+(sigCount>1?'s':'');
+  }else{
+    badge.style.display='none';
+  }
+
+  var html='';
+  myCoins.forEach(function(sym){
+    var sig=myCoinSignals[sym];
+    var priceStr='-';
+    var sigHtml='';
+    var hasSignal=false;
+
+    // find price from rows
+    var row=rows.find(function(r){return r.sym===sym;});
+    if(row) priceStr=fmtPrice(row.price);
+
+    if(sig){
+      // collect all TF signals
+      var sigParts=[];
+      MA7_TFS.forEach(function(tf){
+        if(sig[tf]&&sig[tf].type){
+          var t=sig[tf].type;
+          hasSignal=true;
+          var cls=t==='bull'?'touch-up':t==='bear'?'touch-dn':'touch-neu';
+          var label=({'bull':'↑ MA7 위','bear':'↓ MA7 아래','near':'~ MA7 근접'})[t];
+          sigParts.push('<span class="mycoin-sig '+cls+'">'+tf.toUpperCase()+' '+label+'</span>');
+        }
+      });
+      if(sigParts.length) sigHtml=sigParts.join(' ');
+    }
+
+    html+='<div class="mycoin-card'+(hasSignal?' has-signal':'')+'" data-sym="'+sym+'">';
+    html+='<div class="mycoin-body" onclick="openChart(\''+sym+'\')">';
+    html+='<span class="mycoin-sym">'+sym+'</span>';
+    html+='<span class="mycoin-price">'+priceStr+'</span>';
+    if(sigHtml) html+=sigHtml;
+    html+='</div>';
+    html+='<button class="mycoin-del" onclick="event.stopPropagation();removeMyCoin(\''+sym+'\')" title="삭제">×</button>';
+    html+='</div>';
+  });
+  list.innerHTML=html;
+}
+
+/* MA7 signal check for one coin across 4h/1d/3d/1w */
+function scanOneCoinMA7(sym,cb){
+  if(!myCoinSignals[sym]) myCoinSignals[sym]={};
+  var done=0;
+  MA7_TFS.forEach(function(tf){
+    var limit=tf==='1w'?50:tf==='3d'?50:tf==='1d'?50:100;
+    fetch('https://api.binance.com/api/v3/klines?symbol='+sym+'USDT&interval='+tf+'&limit='+limit)
+      .then(function(r){return r.json();})
+      .then(function(kl){
+        if(!kl||kl.length<8){done++;if(done===MA7_TFS.length&&cb)cb();return;}
+        var closes=kl.map(function(k){return parseFloat(k[4]);});
+        var ma7=calcMA(closes,7);
+        var n=closes.length;
+        var price=closes[n-1];
+        var ma=ma7[n-1];
+        if(ma===null){done++;if(done===MA7_TFS.length&&cb)cb();return;}
+        var distPct=Math.abs(price-ma)/ma*100;
+        var type=null;
+        if(distPct<=MA7_TOUCH_PCT){
+          // touching - determine direction from prev candle
+          type='near';
+          if(price>ma) type='bull'; else type='bear';
+        }
+        myCoinSignals[sym][tf]=type?{type:type,price:price,ma7:ma,dist:distPct.toFixed(2)}:null;
+        done++;
+        if(done===MA7_TFS.length&&cb)cb();
+      }).catch(function(){
+        done++;
+        if(done===MA7_TFS.length&&cb)cb();
+      });
+  });
+}
+
+function scanMyCoinsMA7(){
+  if(!myCoins.length) return;
+  var done=0;
+  myCoins.forEach(function(sym){
+    scanOneCoinMA7(sym,function(){
+      done++;
+      if(done===myCoins.length) renderMyCoins();
+    });
+  });
+}
+
+/* ═══════════════════════════════════════
+   MA7 SIGNAL for CHART VIEW
+═══════════════════════════════════════ */
+function checkMA7Signal(klines,tf){
+  if(!klines||klines.length<8) return null;
+  var closes=klines.map(function(k){return parseFloat(k[4]);});
+  var ma7=calcMA(closes,7);
+  var n=closes.length;
+  var price=closes[n-1];
+  var ma=ma7[n-1];
+  if(ma===null) return null;
+  var distPct=Math.abs(price-ma)/ma*100;
+  if(distPct>MA7_TOUCH_PCT) return null;
+  var type=price>ma?'bull':'bear';
+  return{type:type,price:price,ma7:ma,dist:distPct.toFixed(2),tf:tf};
+}
+
+function showMA7SignalBar(klines,tf){
+  var bar=document.getElementById('ma7-signal-bar');
+  // Only show for 4h/1d/3d/1w
+  var monTFs=['4h','1d','3d','1w'];
+  if(monTFs.indexOf(tf)<0){bar.className='ma7-signal-bar';return;}
+  var sig=checkMA7Signal(klines,tf);
+  if(!sig){bar.className='ma7-signal-bar';return;}
+
+  var icon=sig.type==='bull'?'🟢':sig.type==='bear'?'🔴':'🟡';
+  var label=sig.type==='bull'
+    ?'MA7 위에서 터치 (Bullish)'
+    :sig.type==='bear'
+    ?'MA7 아래에서 터치 (Bearish)'
+    :'MA7 근접';
+
+  document.getElementById('ma7-sig-icon').textContent=icon;
+  var textEl=document.getElementById('ma7-sig-text');
+  textEl.textContent=label;
+  textEl.className='ma7-sig-text '+sig.type;
+
+  var tfBadges='<span class="ma7-tf-badge '+sig.type+'">'+tf.toUpperCase()+'</span>';
+  document.getElementById('ma7-tf-badges').innerHTML=tfBadges;
+  document.getElementById('ma7-sig-sub').textContent=
+    'Price: '+fmtPrice(sig.price)+' | MA7: '+fmtPrice(sig.ma7)+' | Dist: '+sig.dist+'%';
+
+  bar.className='ma7-signal-bar show '+sig.type;
 }
 
 /* CHART MATH */
@@ -508,6 +771,7 @@ function loadChart(sym,tf){
   document.getElementById('vol-chart-container').style.display='none';
   document.getElementById('oi-chart-container').style.display='none';
   document.getElementById('rsi-chart-container').style.display='none';
+  document.getElementById('ma7-signal-bar').className='ma7-signal-bar';
 
   var limit=limitForTf(tf);
   var oiPeriod={'1h':'1h','4h':'4h','1d':'1d','1w':'1d','1M':'1d','3d':'4h'}[tf]||'1h';
@@ -529,6 +793,8 @@ function loadChart(sym,tf){
       document.getElementById('oi-chart-container').style.display='none';
     }
     buildCharts(drawingKlines,oiData);
+    // Show MA7 signal bar for this TF
+    showMA7SignalBar(drawingKlines,tf);
   }).catch(function(e){loadEl.textContent='Error: '+e.message;});
 }
 
@@ -807,7 +1073,28 @@ window.addEventListener('resize',function(){
   if(cv){cv.width=w;redrawOverlay();}
 });
 
+// My Coins add button + enter key
+document.getElementById('mycoin-add-btn').addEventListener('click',function(){
+  var val=document.getElementById('mycoin-input').value;
+  if(val.trim()){addMyCoin(val);document.getElementById('mycoin-input').value='';}
+});
+document.getElementById('mycoin-input').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){
+    var val=this.value;
+    if(val.trim()){addMyCoin(val);this.value='';}
+  }
+});
+
+// Auto-refresh my coins MA7 every 5 minutes
+setInterval(function(){
+  if(myCoins.length) scanMyCoinsMA7();
+},5*60*1000);
+
+// Init
+renderMyCoins();
 load();
+// Scan after initial page load gives time for Binance API
+setTimeout(function(){if(myCoins.length) scanMyCoinsMA7();},3000);
 </script>
 </body>
 </html>
