@@ -152,6 +152,38 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .fp-liq-val{font-size:16px;font-weight:bold;}
 .fp-liq-divider{width:1px;height:36px;background:#2a2a3a;}
 .fp-spot-only{background:rgba(255,165,0,0.06);border:1px solid rgba(255,165,0,0.25);border-radius:8px;padding:10px 14px;font-size:12px;color:#ffa500;margin-bottom:8px;}
+
+/* ── BTC 상대강도 섹션 ── */
+.rs-section{margin:0 20px 16px;background:#111118;border:1px solid #222230;border-radius:10px;padding:14px 16px;}
+.rs-header{display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap;}
+.rs-title{font-size:11px;color:#6b6b80;text-transform:uppercase;letter-spacing:1px;font-weight:bold;}
+.rs-btc-info{font-size:11px;margin-left:auto;display:flex;align-items:center;gap:8px;}
+.rs-btc-badge{font-size:11px;padding:2px 10px;border-radius:99px;font-weight:bold;}
+.rs-btc-up{background:rgba(0,245,160,0.1);color:#00f5a0;border:1px solid rgba(0,245,160,0.3);}
+.rs-btc-dn{background:rgba(255,77,106,0.1);color:#ff4d6a;border:1px solid rgba(255,77,106,0.3);}
+.rs-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+.rs-tab{font-family:monospace;font-size:11px;padding:4px 12px;border-radius:6px;border:1px solid #2a2a3a;background:transparent;color:#6b6b80;cursor:pointer;}
+.rs-tab:hover{color:#e8e8f0;border-color:#e8e8f0;}
+.rs-tab.on{background:rgba(0,245,160,0.1);color:#00f5a0;border-color:#00f5a0;}
+.rs-tab.on.shield{background:rgba(0,245,160,0.1);color:#00f5a0;border-color:#00f5a0;}
+.rs-tab.on.rocket{background:rgba(0,200,255,0.1);color:#00c8ff;border-color:#00c8ff;}
+.rs-tab.on.steady{background:rgba(255,209,102,0.1);color:#ffd166;border-color:#ffd166;}
+.rs-count{font-size:10px;color:#6b6b80;margin-left:4px;}
+.rs-list{display:flex;flex-wrap:wrap;gap:8px;}
+.rs-card{display:flex;flex-direction:column;gap:4px;background:#1a1a24;border:1px solid #2a2a3a;border-radius:8px;padding:10px 13px;cursor:pointer;min-width:110px;transition:border-color 0.15s;}
+.rs-card:hover{border-color:#00c8ff;}
+.rs-card-sym{font-size:13px;font-weight:bold;color:#e8e8f0;}
+.rs-card-rs{font-size:15px;font-weight:bold;}
+.rs-card-rs.pos{color:#00f5a0;}
+.rs-card-rs.neg{color:#ff4d6a;}
+.rs-card-chg{font-size:10px;color:#6b6b80;}
+.rs-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;}
+.rs-badge{font-size:9px;padding:1px 6px;border-radius:99px;font-weight:bold;}
+.rs-b-shield{background:rgba(0,245,160,0.12);color:#00f5a0;border:1px solid rgba(0,245,160,0.3);}
+.rs-b-rocket{background:rgba(0,200,255,0.1);color:#00c8ff;border:1px solid rgba(0,200,255,0.25);}
+.rs-b-steady{background:rgba(255,209,102,0.1);color:#ffd166;border:1px solid rgba(255,209,102,0.3);}
+.rs-empty{font-size:12px;color:#3a3a4a;padding:8px 0;}
+.rs-loading{font-size:11px;color:#6b6b80;padding:8px 0;}
 </style>
 </head>
 <body>
@@ -170,6 +202,25 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     </div>
     <div class="mycoins-list" id="mycoins-list">
       <span class="mycoins-empty" id="mycoins-empty">코인을 추가하세요 (예: BTC, ETH, SOL)</span>
+    </div>
+  </div>
+
+  <!-- ── BTC 상대강도 ── -->
+  <div class="rs-section">
+    <div class="rs-header">
+      <span class="rs-title">⚡ BTC 상대강도</span>
+      <div class="rs-btc-info">
+        <span style="font-size:11px;color:#6b6b80;">BTC 24h</span>
+        <span class="rs-btc-badge" id="rs-btc-badge">-</span>
+      </div>
+    </div>
+    <div class="rs-tabs">
+      <button class="rs-tab shield on" data-rs="shield" id="rs-tab-shield">🛡️ BTC 하락 방어 <span class="rs-count" id="rs-cnt-shield"></span></button>
+      <button class="rs-tab rocket" data-rs="rocket" id="rs-tab-rocket">🚀 모멘텀 급등 <span class="rs-count" id="rs-cnt-rocket"></span></button>
+      <button class="rs-tab steady" data-rs="steady" id="rs-tab-steady">💎 꾸준한 강세 <span class="rs-count" id="rs-cnt-steady"></span></button>
+    </div>
+    <div class="rs-list" id="rs-list">
+      <span class="rs-loading">스캔 완료 후 자동으로 집계됩니다...</span>
     </div>
   </div>
 
@@ -345,6 +396,11 @@ var trendPoints=[],drawnPriceLines=[],overlayLines=[];
 var capMap={},futuresSet={};
 var drawingKlines=[];
 
+// ── BTC 상대강도 ──
+var rsMode='shield'; // shield | rocket | steady
+var rsData={shield:[],rocket:[],steady:[]};
+var btcChg=0;
+
 // ── MY COINS STATE ──
 var myCoins=JSON.parse(localStorage.getItem('myCoins')||'[]');
 // MA7 signal cache: {sym: {tf: 'bull'|'bear'|'near'|null, price, ma7, dist}}
@@ -458,6 +514,8 @@ function load(){
           render();
           // refresh my coins signals after scan
           scanMyCoinsMA7();
+          // BTC 상대강도 계산
+          computeRS();
           return;
         }
         var batch=pool.slice(idx,idx+8);idx+=8;
@@ -728,6 +786,125 @@ function showMA7SignalBar(klines,tf){
     'Price: '+fmtPrice(sig.price)+' | MA7: '+fmtPrice(sig.ma7)+' | Dist: '+sig.dist+'%';
 
   bar.className='ma7-signal-bar show '+sig.type;
+}
+
+/* ═══════════════════════════════════════
+   BTC 상대강도
+═══════════════════════════════════════ */
+function computeRS(){
+  // BTC 24h 변화율
+  var btcRow=rows.find(function(r){return r.sym==='BTC';});
+  if(!btcRow){renderRS();return;}
+  btcChg=btcRow.chg;
+
+  // BTC 배지
+  var badge=document.getElementById('rs-btc-badge');
+  badge.textContent='BTC '+(btcChg>=0?'+':'')+btcChg.toFixed(2)+'%';
+  badge.className='rs-btc-badge '+(btcChg>=0?'rs-btc-up':'rs-btc-dn');
+
+  var shield=[],rocket=[],steady=[];
+
+  rows.forEach(function(d){
+    if(d.sym==='BTC'||d.sym==='WBTC') return;
+    var rs=d.chg-btcChg; // 상대강도 = 알트 수익률 - BTC 수익률
+
+    var badges=[];
+
+    // 🛡️ BTC 하락 방어: BTC가 하락 중인데 상대강도 플러스 (알트가 더 잘 버팀)
+    if(btcChg<-0.5&&rs>1.5){
+      badges.push('shield');
+      shield.push({sym:d.sym,rs:rs,chg:d.chg,vol:d.vol,badges:badges.slice()});
+    }
+
+    // 🚀 모멘텀 급등: BTC 방향 무관하게 상대강도가 매우 강함 (rs > 4%)
+    if(rs>4){
+      if(badges.indexOf('rocket')<0) badges.push('rocket');
+      // shield에 없으면 rocket에 추가
+      var alreadyShield=shield.some(function(x){return x.sym===d.sym;});
+      if(!alreadyShield){
+        rocket.push({sym:d.sym,rs:rs,chg:d.chg,vol:d.vol,badges:badges.slice()});
+      } else {
+        // shield에 있으면 거기다 배지만 추가
+        var si=shield.findIndex(function(x){return x.sym===d.sym;});
+        if(si>=0&&shield[si].badges.indexOf('rocket')<0) shield[si].badges.push('rocket');
+      }
+    }
+
+    // 💎 꾸준한 강세: HH-HL 이면서 상대강도 플러스 (추세 + 상대강도 동시)
+    if(d.hl===2&&d.trend===2&&rs>0.5){
+      if(badges.indexOf('steady')<0) badges.push('steady');
+      var alreadyIn=shield.some(function(x){return x.sym===d.sym;})||
+                    rocket.some(function(x){return x.sym===d.sym;});
+      if(!alreadyIn){
+        steady.push({sym:d.sym,rs:rs,chg:d.chg,vol:d.vol,badges:['steady']});
+      } else {
+        // 기존 배열에 steady 배지만 추가
+        var addSteady=function(arr){
+          var idx=arr.findIndex(function(x){return x.sym===d.sym;});
+          if(idx>=0&&arr[idx].badges.indexOf('steady')<0) arr[idx].badges.push('steady');
+        };
+        addSteady(shield);addSteady(rocket);
+      }
+    }
+  });
+
+  // 상대강도 내림차순 정렬
+  var sortRS=function(a,b){return b.rs-a.rs;};
+  rsData.shield=shield.sort(sortRS);
+  rsData.rocket=rocket.sort(sortRS);
+  rsData.steady=steady.sort(sortRS);
+
+  // 탭 카운트 업데이트
+  document.getElementById('rs-cnt-shield').textContent=shield.length?'('+shield.length+')':'';
+  document.getElementById('rs-cnt-rocket').textContent=rocket.length?'('+rocket.length+')':'';
+  document.getElementById('rs-cnt-steady').textContent=steady.length?'('+steady.length+')':'';
+
+  renderRS();
+}
+
+function setRsTab(tab){
+  rsMode=tab;
+  ['shield','rocket','steady'].forEach(function(t){
+    var el=document.getElementById('rs-tab-'+t);
+    el.className='rs-tab '+t+(t===tab?' on':'');
+  });
+  renderRS();
+}
+
+function renderRS(){
+  var list=document.getElementById('rs-list');
+  var data=rsData[rsMode]||[];
+
+  if(!data.length){
+    var msgs={
+      shield:btcChg>=-0.5?'BTC가 하락 중이 아니거나 방어하는 코인이 없습니다':'방어 코인 없음',
+      rocket:'상대강도 급등 코인 없음 (기준: BTC 대비 +4% 이상)',
+      steady:'HH-HL + 상대강도 동시 충족 코인 없음'
+    };
+    list.innerHTML='<span class="rs-empty">'+msgs[rsMode]+'</span>';
+    return;
+  }
+
+  var html='';
+  data.forEach(function(d){
+    var rsSign=d.rs>=0?'+':'';
+    var chgSign=d.chg>=0?'+':'';
+    var badgeHtml='';
+    if(d.badges){
+      d.badges.forEach(function(b){
+        var labels={shield:'🛡️ 방어',rocket:'🚀 모멘텀',steady:'💎 강세'};
+        var cls={shield:'rs-b-shield',rocket:'rs-b-rocket',steady:'rs-b-steady'};
+        badgeHtml+='<span class="rs-badge '+cls[b]+'">'+labels[b]+'</span>';
+      });
+    }
+    html+='<div class="rs-card" onclick="openChart(\''+d.sym+'\')">';
+    html+='<span class="rs-card-sym">'+d.sym+'</span>';
+    html+='<span class="rs-card-rs '+(d.rs>=0?'pos':'neg')+'">RS '+rsSign+d.rs.toFixed(2)+'%</span>';
+    html+='<span class="rs-card-chg">ALT '+(d.chg>=0?'+':'')+d.chg.toFixed(2)+'% / BTC '+(btcChg>=0?'+':'')+btcChg.toFixed(2)+'%</span>';
+    if(badgeHtml) html+='<div class="rs-badges">'+badgeHtml+'</div>';
+    html+='</div>';
+  });
+  list.innerHTML=html;
 }
 
 /* CHART MATH */
@@ -1256,6 +1433,13 @@ window.addEventListener('resize',function(){
   if(rsiChart) rsiChart.applyOptions({width:document.getElementById('rsi-chart-container').clientWidth});
   var cv=document.getElementById('draw-canvas-overlay');
   if(cv){cv.width=w;redrawOverlay();}
+});
+
+// BTC 상대강도 탭
+document.querySelectorAll('.rs-tab').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    setRsTab(btn.getAttribute('data-rs'));
+  });
 });
 
 // My Coins add button + enter key
