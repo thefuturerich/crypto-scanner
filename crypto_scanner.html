@@ -45,6 +45,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .tag{display:inline-block;font-size:9px;padding:1px 6px;border-radius:99px;margin-left:3px;background:rgba(0,200,255,0.1);color:#00c8ff;border:1px solid rgba(0,200,255,0.25);}
 .tag-hot{background:rgba(255,77,106,0.1);color:#ff4d6a;border-color:rgba(255,77,106,0.3);}
 .tag-fut{background:rgba(255,165,0,0.12);color:#ffa500;border:1px solid rgba(255,165,0,0.3);}
+.tag-alpha{background:rgba(192,132,252,0.12);color:#c084fc;border:1px solid rgba(192,132,252,0.3);}
 .empty{text-align:center;padding:40px;color:#6b6b80;}
 
 /* ── MY COINS SECTION ── */
@@ -189,6 +190,16 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 <body>
 <div id="scanner-view">
   <div style="padding:20px 20px 0"><h1>TREND SCAN</h1><div class="sub">HH/HL Scanner - Binance Live - Click symbol for chart</div></div>
+
+  <!-- ── BINANCE ALPHA + FUTURES ── -->
+  <div class="mycoins-section" id="alpha-section" style="display:none">
+    <div class="mycoins-header">
+      <span class="mycoins-title" style="color:#c084fc">α 바이낸스 알파 + 선물</span>
+      <span style="font-size:10px;color:#6b6b80;margin-left:6px" id="alpha-count"></span>
+      <span style="font-size:10px;color:#6b6b80;margin-left:auto">알파 상장 & 선물 동시 거래 가능</span>
+    </div>
+    <div class="mycoins-list" id="alpha-list"></div>
+  </div>
 
   <!-- ── MY COINS ── -->
   <div class="mycoins-section">
@@ -400,6 +411,7 @@ var drawingKlines=[];
 var rsMode='shield'; // shield | rocket | steady
 var rsData={shield:[],rocket:[],steady:[]};
 var btcChg=0;
+var alphaSet={}; // 알파 CEX 상장 심볼 집합
 
 // ── MY COINS STATE ──
 var myCoins=JSON.parse(localStorage.getItem('myCoins')||'[]');
@@ -464,12 +476,28 @@ function load(){
     fetch('https://api.binance.com/api/v3/ticker/24hr').then(function(r){return r.json();}),
     fetch('https://fapi.binance.com/fapi/v1/premiumIndex').then(function(r){return r.json();}).catch(function(){return [];}),
     fetch('https://fapi.binance.com/fapi/v1/openInterest').then(function(r){return r.json();}).catch(function(){return [];}),
-    fetch('https://fapi.binance.com/fapi/v1/exchangeInfo').then(function(r){return r.json();}).catch(function(){return null;})
+    fetch('https://fapi.binance.com/fapi/v1/exchangeInfo').then(function(r){return r.json();}).catch(function(){return null;}),
+    fetch('https://www.binance.com/bapi/defi/v1/public/wallet-direct/buw/wallet/cex/alpha/all/token/list').then(function(r){return r.json();}).catch(function(){return null;})
   ]).then(function(res){
     var spotTickers=res[0];
     var fundingRaw=res[1];
     var oiRaw=res[2];
     var futInfo=res[3];
+    var alphaRaw=res[4];
+
+    // 알파 CEX 상장 심볼 추출 (listingCex:true 인 것만)
+    alphaSet={};
+    if(alphaRaw&&alphaRaw.data&&Array.isArray(alphaRaw.data)){
+      alphaRaw.data.forEach(function(t){
+        if(t.listingCex&&t.cexCoinName){
+          alphaSet[t.cexCoinName.toUpperCase()]=true;
+        }
+        // cexCoinName 없는 경우 symbol로도 시도
+        if(t.listingCex&&t.symbol){
+          alphaSet[t.symbol.toUpperCase()]=true;
+        }
+      });
+    }
 
     var fundingMap={};
     if(Array.isArray(fundingRaw)){
@@ -516,6 +544,8 @@ function load(){
           scanMyCoinsMA7();
           // BTC 상대강도 계산
           computeRS();
+          // 알파+선물 섹션
+          renderAlphaSection();
           return;
         }
         var batch=pool.slice(idx,idx+8);idx+=8;
@@ -541,6 +571,7 @@ function load(){
               var price=parseFloat(t.lastPrice);
               var oiQty=oiMap[t.symbol]||0;
               var isFutures=!!futuresSet[sym];
+              var isAlpha=!!alphaSet[sym];
               return{
                 sym:sym,price:price,
                 chg:parseFloat(t.priceChangePercent),
@@ -549,6 +580,7 @@ function load(){
                 funding:fundingMap[t.symbol]!==undefined?fundingMap[t.symbol]:null,
                 oi:oiQty>0?oiQty*price:null,
                 isFutures:isFutures,
+                isAlpha:isAlpha,
                 hl:hlScore,trend:trend,
                 vSpike:vl[n-1]>vSum/(vl.length-1)*1.5,
                 strong:hlScore===2&&trend===2
@@ -590,10 +622,11 @@ function render(){
     var trPill=d.trend===2?'<span class="pill pg">Bull</span>':d.trend===1?'<span class="pill py">Neutral</span>':'<span class="pill pr">Bear</span>';
     var sigs=(d.strong?'<span class="tag tag-hot">Strong</span>':'')+(d.vSpike?'<span class="tag">VolUp</span>':'');
     var futTag=d.isFutures?'<span class="tag tag-fut">F</span>':'';
+    var alphaTag=d.isAlpha?'<span class="tag tag-alpha">α</span>':'';
     var fcc=d.funding===null?'neu':d.funding>0.05?'dn':d.funding<-0.01?'up':'neu';
     var fStr=d.funding===null?'-':(d.funding>0?'+':'')+d.funding.toFixed(4)+'%';
     html+='<tr>';
-    html+='<td><span class="sym-link" data-sym="'+d.sym+'">'+d.sym+'</span>'+futTag+'</td>';
+    html+='<td><span class="sym-link" data-sym="'+d.sym+'">'+d.sym+'</span>'+futTag+alphaTag+'</td>';
     html+='<td class="neu">'+fmtPrice(d.price)+'</td>';
     html+='<td class="'+cc+'">'+sign+d.chg.toFixed(2)+'%</td>';
     html+='<td class="neu">'+(d.cap?fmtBig(d.cap):'-')+'</td>';
@@ -608,6 +641,39 @@ function render(){
   document.querySelectorAll('.sym-link').forEach(function(el){
     el.addEventListener('click',function(){openChart(el.getAttribute('data-sym'));});
   });
+}
+
+/* ═══════════════════════════════════════
+   ALPHA + FUTURES 섹션
+═══════════════════════════════════════ */
+function renderAlphaSection(){
+  var alphaFut=rows.filter(function(d){return d.isAlpha&&d.isFutures;});
+  var sec=document.getElementById('alpha-section');
+  if(!alphaFut.length){sec.style.display='none';return;}
+
+  sec.style.display='block';
+  document.getElementById('alpha-count').textContent='('+alphaFut.length+'개)';
+
+  // 상대강도 내림차순 정렬
+  var btcRow=rows.find(function(r){return r.sym==='BTC';});
+  var bChg=btcRow?btcRow.chg:0;
+  alphaFut.sort(function(a,b){return (b.chg-bChg)-(a.chg-bChg);});
+
+  var html='';
+  alphaFut.forEach(function(d){
+    var rs=d.chg-bChg;
+    var rsStr=(rs>=0?'+':'')+rs.toFixed(2)+'%';
+    var rsColor=rs>=0?'#00f5a0':'#ff4d6a';
+    var chgColor=d.chg>=0?'#00f5a0':'#ff4d6a';
+    html+='<div class="mycoin-card" onclick="openChart(\''+d.sym+'\')">';
+    html+='<div class="mycoin-body">';
+    html+='<span class="mycoin-sym">'+d.sym+'</span>';
+    html+='<span class="mycoin-price" style="color:'+chgColor+'">'+(d.chg>=0?'+':'')+d.chg.toFixed(2)+'%</span>';
+    html+='<span style="font-size:10px;color:'+rsColor+'">RS '+rsStr+'</span>';
+    html+='</div>';
+    html+='</div>';
+  });
+  document.getElementById('alpha-list').innerHTML=html;
 }
 
 /* ═══════════════════════════════════════
