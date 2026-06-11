@@ -185,6 +185,38 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .rs-b-steady{background:rgba(255,209,102,0.1);color:#ffd166;border:1px solid rgba(255,209,102,0.3);}
 .rs-empty{font-size:12px;color:#3a3a4a;padding:8px 0;}
 .rs-loading{font-size:11px;color:#6b6b80;padding:8px 0;}
+
+/* ── HTF HIGHER LOWS SCANNER ── */
+.hl-section{margin:0 20px 16px;background:#111118;border:1px solid #222230;border-radius:10px;padding:14px 16px;}
+.hl-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.hl-title{font-size:11px;color:#6b6b80;text-transform:uppercase;letter-spacing:1px;font-weight:bold;}
+.hl-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-left:auto;}
+.hl-select{background:#1a1a24;border:1px solid #2a2a3a;color:#e8e8f0;font-family:monospace;font-size:11px;padding:4px 8px;border-radius:6px;cursor:pointer;outline:none;}
+.hl-scan-btn{font-family:monospace;font-size:11px;padding:4px 14px;border-radius:6px;border:1px solid #00f5a0;background:rgba(0,245,160,0.08);color:#00f5a0;cursor:pointer;}
+.hl-scan-btn:hover{background:rgba(0,245,160,0.18);}
+.hl-scan-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.hl-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:12px;}
+.hl-mc{background:#1a1a24;border:1px solid #222230;border-radius:8px;padding:10px 12px;}
+.hl-mc-l{font-size:10px;color:#6b6b80;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.hl-mc-v{font-size:20px;font-weight:bold;color:#e8e8f0;}
+.hl-mc-v.green{color:#00f5a0;}
+.hl-prog-wrap{height:2px;background:#1a1a24;border-radius:2px;margin-bottom:8px;}
+.hl-prog{height:100%;width:0%;background:#00f5a0;border-radius:2px;transition:width 0.3s;}
+.hl-status{font-size:11px;color:#6b6b80;margin-bottom:10px;}
+.hl-table-wrap{overflow-x:auto;}
+.hl-table{width:100%;border-collapse:collapse;font-size:12px;min-width:700px;}
+.hl-table thead{background:#1a1a24;}
+.hl-table th{text-align:left;padding:8px 10px;font-size:10px;color:#6b6b80;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #222230;white-space:nowrap;}
+.hl-table td{padding:8px 10px;border-bottom:1px solid #1a1a24;white-space:nowrap;}
+.hl-table tr:last-child td{border-bottom:none;}
+.hl-table tr:hover td{background:rgba(255,255,255,0.02);}
+.hl-sym{font-weight:bold;font-size:13px;color:#00c8ff;cursor:pointer;text-decoration:underline;}
+.hl-sym:hover{color:#00f5a0;}
+.hl-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:bold;}
+.hl-strong{background:rgba(0,245,160,0.12);color:#00f5a0;border:1px solid rgba(0,245,160,0.3);}
+.hl-moderate{background:rgba(0,200,255,0.1);color:#00c8ff;border:1px solid rgba(0,200,255,0.25);}
+.hl-weak{background:rgba(255,209,102,0.1);color:#ffd166;border:1px solid rgba(255,209,102,0.3);}
+.hl-seq{font-size:10px;color:#6b6b80;max-width:180px;overflow:hidden;text-overflow:ellipsis;}
 </style>
 </head>
 <body>
@@ -216,8 +248,56 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     </div>
   </div>
 
+  <!-- ── HTF HIGHER LOWS SCANNER ── -->
+  <div class="hl-section">
+    <div class="hl-header">
+      <span class="hl-title">📈 HTF 저점 상승 스캐너</span>
+      <div class="hl-controls">
+        <select class="hl-select" id="hl-tf">
+          <option value="1d">Daily</option>
+          <option value="3d">3Day</option>
+          <option value="1w">Weekly</option>
+        </select>
+        <select class="hl-select" id="hl-n">
+          <option value="3">저점 3개</option>
+          <option value="4" selected>저점 4개</option>
+          <option value="5">저점 5개</option>
+        </select>
+        <select class="hl-select" id="hl-market">
+          <option value="50">Top 50</option>
+          <option value="100">Top 100</option>
+          <option value="200">Top 200</option>
+        </select>
+        <button class="hl-scan-btn" id="hl-scan-btn">스캔</button>
+      </div>
+    </div>
+    <div class="hl-metrics">
+      <div class="hl-mc"><div class="hl-mc-l">스캔</div><div class="hl-mc-v" id="hl-m1">—</div></div>
+      <div class="hl-mc"><div class="hl-mc-l">패턴</div><div class="hl-mc-v green" id="hl-m2">—</div></div>
+      <div class="hl-mc"><div class="hl-mc-l">강한 신호</div><div class="hl-mc-v" id="hl-m3">—</div></div>
+      <div class="hl-mc"><div class="hl-mc-l">업데이트</div><div class="hl-mc-v sm" id="hl-m4" style="font-size:12px;">—</div></div>
+    </div>
+    <div class="hl-prog-wrap"><div class="hl-prog" id="hl-prog"></div></div>
+    <div class="hl-status" id="hl-status">스캔 버튼을 눌러 시작하세요</div>
+    <div class="hl-table-wrap" id="hl-table-wrap" style="display:none">
+      <table class="hl-table">
+        <thead><tr>
+          <th>Symbol</th>
+          <th>TF</th>
+          <th>Price</th>
+          <th>저점 흐름</th>
+          <th>강도</th>
+          <th>24h Chg</th>
+          <th>Volume</th>
+        </tr></thead>
+        <tbody id="hl-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- ── BTC 상대강도 ── -->
   <div class="rs-section">
+
     <div class="rs-header">
       <span class="rs-title">⚡ BTC 상대강도</span>
       <div class="rs-btc-info">
@@ -1530,6 +1610,141 @@ renderMyCoins();
 load();
 // Scan after initial page load gives time for Binance API
 setTimeout(function(){if(myCoins.length) scanMyCoinsMA7();},3000);
+
+// ── HTF HIGHER LOWS SCANNER ──
+(function(){
+  var hlScanning=false;
+
+  function hlFmt(p){
+    if(p>=1000) return p.toLocaleString('en',{maximumFractionDigits:1});
+    if(p>=1) return p.toFixed(3);
+    if(p>=0.001) return p.toFixed(5);
+    return p.toFixed(8);
+  }
+  function hlFmtVol(v){
+    if(v>=1e9) return (v/1e9).toFixed(1)+'B';
+    if(v>=1e6) return (v/1e6).toFixed(1)+'M';
+    return (v/1e3).toFixed(0)+'K';
+  }
+  function hlBadge(str){
+    if(str>=1.5) return '<span class="hl-badge hl-strong">강함</span>';
+    if(str>=0.5) return '<span class="hl-badge hl-moderate">보통</span>';
+    return '<span class="hl-badge hl-weak">약함</span>';
+  }
+
+  async function hlGetSymbols(limit){
+    var r=await fetch('https://fapi.binance.com/fapi/v1/ticker/24hr');
+    var data=await r.json();
+    return data
+      .filter(function(d){return d.symbol.endsWith('USDT')&&!d.symbol.includes('_');})
+      .sort(function(a,b){return parseFloat(b.quoteVolume)-parseFloat(a.quoteVolume);})
+      .slice(0,limit)
+      .map(function(d){return{symbol:d.symbol,priceChange:parseFloat(d.priceChangePercent),lastPrice:parseFloat(d.lastPrice),volume:parseFloat(d.quoteVolume)};});
+  }
+
+  async function hlGetKlines(symbol,interval,limit){
+    var r=await fetch('https://fapi.binance.com/fapi/v1/klines?symbol='+symbol+'&interval='+interval+'&limit='+limit);
+    var data=await r.json();
+    return data.map(function(k){return{low:parseFloat(k[3]),close:parseFloat(k[4])};});
+  }
+
+  function detectHL(candles,n){
+    var lows=candles.map(function(c){return c.low;});
+    var count=0,strength=0,seq=[];
+    for(var i=lows.length-n;i<lows.length-1;i++){
+      if(lows[i+1]>lows[i]){
+        count++;
+        strength+=(lows[i+1]-lows[i])/lows[i]*100;
+        if(seq.length===0) seq.push(lows[i]);
+        seq.push(lows[i+1]);
+      } else {
+        count=0;strength=0;seq=[];
+      }
+    }
+    return{isValid:count>=n-1,count:count,strength:count>0?strength/count:0,seq:seq};
+  }
+
+  function setP(pct,msg){
+    document.getElementById('hl-prog').style.width=pct+'%';
+    document.getElementById('hl-status').textContent=msg;
+  }
+
+  document.getElementById('hl-scan-btn').addEventListener('click',async function(){
+    if(hlScanning) return;
+    hlScanning=true;
+    var btn=document.getElementById('hl-scan-btn');
+    btn.disabled=true;
+    btn.textContent='스캔 중...';
+    document.getElementById('hl-table-wrap').style.display='none';
+    document.getElementById('hl-tbody').innerHTML='';
+    document.getElementById('hl-m1').textContent='—';
+    document.getElementById('hl-m2').textContent='—';
+    document.getElementById('hl-m3').textContent='—';
+
+    var tf=document.getElementById('hl-tf').value;
+    var n=parseInt(document.getElementById('hl-n').value);
+    var limit=parseInt(document.getElementById('hl-market').value);
+    var kLimit=n+30;
+
+    try{
+      setP(5,'심볼 목록 가져오는 중...');
+      var syms=await hlGetSymbols(limit);
+      document.getElementById('hl-m1').textContent=syms.length;
+
+      var results=[];
+      var batch=10;
+      for(var i=0;i<syms.length;i+=batch){
+        var slice=syms.slice(i,i+batch);
+        var pct=Math.round(5+(i/syms.length)*90);
+        setP(pct,'분석 중 '+(i+1)+' / '+syms.length+' — '+slice[0].symbol);
+        await Promise.all(slice.map(async function(sym){
+          try{
+            var candles=await hlGetKlines(sym.symbol,tf,kLimit);
+            if(candles.length<n+1) return;
+            var res=detectHL(candles,n);
+            if(res.isValid) results.push(Object.assign({},sym,{hlStrength:res.strength,hlSeq:res.seq,tf:tf}));
+          }catch(e){}
+        }));
+        await new Promise(function(r){setTimeout(r,120);});
+      }
+
+      results.sort(function(a,b){return b.hlStrength-a.hlStrength;});
+      var strong=results.filter(function(r){return r.hlStrength>=1.5;}).length;
+      document.getElementById('hl-m2').textContent=results.length;
+      document.getElementById('hl-m3').textContent=strong;
+      document.getElementById('hl-m4').textContent=new Date().toLocaleTimeString('ko');
+      setP(100,'완료 — '+results.length+'개 패턴 감지');
+
+      var tfLabel={'1d':'1D','3d':'3D','1w':'1W'};
+      var tbody=document.getElementById('hl-tbody');
+      if(results.length===0){
+        tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:#3a3a4a;">패턴이 감지된 코인이 없습니다</td></tr>';
+      } else {
+        results.forEach(function(r){
+          var seq=r.hlSeq.map(hlFmt).join(' → ');
+          var coin=r.symbol.replace('USDT','');
+          var chgClass=r.priceChange>=0?'up':'dn';
+          var chgStr=(r.priceChange>=0?'+':'')+r.priceChange.toFixed(2)+'%';
+          var tr=document.createElement('tr');
+          tr.innerHTML='<td><span class="hl-sym" onclick="openChart(\''+r.symbol+'\')">'+coin+'/USDT</span></td>'
+            +'<td style="color:#6b6b80">'+tfLabel[r.tf]+'</td>'
+            +'<td>'+hlFmt(r.lastPrice)+'</td>'
+            +'<td class="hl-seq" title="'+seq+'">'+seq+'</td>'
+            +'<td>'+hlBadge(r.hlStrength)+'</td>'
+            +'<td class="'+chgClass+'">'+chgStr+'</td>'
+            +'<td style="color:#6b6b80">'+hlFmtVol(r.volume)+'</td>';
+          tbody.appendChild(tr);
+        });
+      }
+      document.getElementById('hl-table-wrap').style.display='block';
+    }catch(e){
+      setP(0,'오류: '+e.message);
+    }
+    btn.disabled=false;
+    btn.textContent='스캔';
+    hlScanning=false;
+  });
+})();
 </script>
 </body>
 </html>
